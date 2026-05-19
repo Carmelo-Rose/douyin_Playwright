@@ -1,0 +1,27 @@
+{
+  "name": "douyin_playwright",
+  "version": "1.0.0",
+  "description": "Local Playwright demo for capturing Douyin mall search product data.",
+  "main": "dist/index.js",
+  "scripts": {
+    "capture": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "exceljs": "^4.4.0",
+    "fs-extra": "^11.3.5",
+    "playwright": "^1.60.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^25.8.0",
+    "tsx": "^4.22.1",
+    "typescript": "^6.0.3"
+  }
+}
