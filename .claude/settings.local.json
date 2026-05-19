@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(iconv -f UTF-16LE -t UTF-8 控制台日志.txt)",
+      "Bash(npm install *)"
+    ]
+  }
+}

@@ -1,45 +1,126 @@
+import path from "node:path";
+import process from "node:process";
+import fs from "fs-extra";
 import type { Page, Response } from "playwright";
 import { normalizeCandidates } from "./normalize.js";
-import type { ProductRecord, RawProductCandidate } from "./types.js";
+import type { RawVideoCandidate, VideoRecord } from "./types.js";
 
-const PRODUCT_KEYS = [
-  "product",
-  "commodity",
-  "goods",
-  "item",
-  "sku",
-  "shop",
-  "price",
-  "sale",
-  "douyin",
-  "ecom",
+const URL_PREFIX_ALLOW = [
+  "/aweme/v1/web/",
+  "/aweme/v2/web/",
 ];
 
-export function attachNetworkCapture(page: Page): () => ProductRecord[] {
-  const products: ProductRecord[] = [];
+const URL_BLACKLIST = [
+  "verifycenter",
+  "captcha",
+  "survey",
+  "questionnaire",
+  "/nps",
+  "feedback",
+  "monitor",
+  "track",
+  "report",
+  "/im/",
+  "notice",
+  "emoji",
+  "emoticon",
+  "sticker",
+  "favorite",
+  "watermark",
+  "hot/search",
+  "abtest",
+  "carnival",
+  "installed",
+  "passport",
+  "webcast/setting",
+  "spotlight",
+  "multicast",
+  "mix/listcollection",
+  "page/turn",
+  "solution/resource",
+  "user/settings",
+  "user/info",
+  "ttwid",
+  "creator/external",
+  "activity/pull",
+  "suggest_words",
+  "search/sug",
+  "select/tab/course",
+  "test/settings",
+  "ab/params",
+  "external/notification",
+  "social/count",
+  "query/user",
+];
+
+const DEBUG = process.env.DEBUG_CAPTURE === "true" || process.env.DEBUG_CAPTURE === "1";
+const DEBUG_DUMP_DIR = path.resolve(process.cwd(), "output");
+const DEBUG_DUMP_MAX = 15;
+
+export interface NetworkCaptureHandle {
+  getVideos: () => VideoRecord[];
+  reset: () => void;
+}
+
+export function attachNetworkCapture(page: Page): NetworkCaptureHandle {
+  const videos: VideoRecord[] = [];
   const seenUrls = new Set<string>();
+  let dumpsWritten = 0;
 
   page.on("response", async (response) => {
+    if (DEBUG && ["xhr", "fetch"].includes(response.request().resourceType()) && response.status() >= 200 && response.status() < 400) {
+      const u = response.url();
+      const lower = u.toLowerCase();
+      const skip = URL_BLACKLIST.some((k) => lower.includes(k)) || lower.includes(".js") || lower.includes(".css") || lower.includes(".png") || lower.includes(".jpg") || lower.includes(".webp");
+      if (!skip) {
+        const short = u.length > 220 ? u.slice(0, 220) + "..." : u;
+        console.log(`[xhr] ${short}`);
+      }
+    }
     if (!isCandidateResponse(response) || seenUrls.has(response.url())) {
       return;
     }
 
     seenUrls.add(response.url());
 
+    let json: unknown;
     try {
-      const json = await response.json();
-      const candidates = extractCandidatesFromJson(json);
-      products.push(...normalizeCandidates(candidates, "network"));
+      json = await response.json();
     } catch {
-      // Many matching responses are streaming, encrypted, or not JSON. Ignore them.
+      return;
     }
+
+    const candidates = extractCandidatesFromJson(json);
+    if (DEBUG) {
+      console.log(`[capture] url=${response.url()} candidates=${candidates.length}`);
+      if (dumpsWritten < DEBUG_DUMP_MAX) {
+        dumpsWritten += 1;
+        const slug = pathSlug(response.url());
+        const filename = `debug-${Date.now()}-${dumpsWritten}-${slug}.json`;
+        const filepath = path.join(DEBUG_DUMP_DIR, filename);
+        fs.ensureDir(DEBUG_DUMP_DIR)
+          .then(() => fs.writeJson(filepath, { url: response.url(), body: json }, { spaces: 2 }))
+          .then(() => console.log(`[capture] dumped raw response to ${filepath}`))
+          .catch((err: unknown) => console.warn(`[capture] dump failed: ${err instanceof Error ? err.message : String(err)}`));
+      }
+    }
+    videos.push(...normalizeCandidates(candidates));
   });
 
-  return () => products;
+  return {
+    getVideos: () => videos,
+    reset: () => {
+      videos.length = 0;
+      seenUrls.clear();
+      if (DEBUG) {
+        console.log("[capture] buffer reset");
+      }
+    },
+  };
 }
 
-export function extractCandidatesFromJson(json: unknown): RawProductCandidate[] {
-  const candidates: RawProductCandidate[] = [];
+export function extractCandidatesFromJson(json: unknown): RawVideoCandidate[] {
+  const candidates: RawVideoCandidate[] = [];
   walkJson(json, candidates, 0);
   return candidates;
 }
@@ -51,29 +132,33 @@ function isCandidateResponse(response: Response): boolean {
     return false;
   }
 
-  const url = response.url().toLowerCase();
-  const contentType = response.headers()["content-type"]?.toLowerCase() || "";
-  const hasProductSignal = PRODUCT_KEYS.some((key) => url.includes(key));
+  if (response.status() < 200 || response.status() >= 300) {
+    return false;
+  }
 
-  return response.status() >= 200 && response.status() < 300 && (contentType.includes("json") || hasProductSignal);
+  const url = response.url().toLowerCase();
+  if (URL_BLACKLIST.some((key) => url.includes(key))) {
+    return false;
+  }
+
+  return URL_PREFIX_ALLOW.some((prefix) => url.includes(prefix));
 }
 
-function walkJson(value: unknown, output: RawProductCandidate[], depth: number): void {
-  if (depth > 12 || value === null || value === undefined) {
+function pathSlug(rawUrl: string): string {
+  try {
+    const parsed = new URL(rawUrl);
+    return parsed.pathname.replace(/^\/+|\/+$/g, "").replace(/\//g, "_").slice(0, 60) || "root";
+  } catch {
+    return "url";
+  }
+}
+
+function walkJson(value: unknown, output: RawVideoCandidate[], depth: number): void {
+  if (depth > 14 || value === null || value === undefined) {
     return;
   }
 
   if (Array.isArray(value)) {
-    if (looksLikeProductList(value)) {
-      for (const item of value) {
-        const candidate = objectToCandidate(item);
-        if (candidate) {
-          output.push(candidate);
-        }
-      }
-      return;
-    }
-
     for (const item of value) {
       walkJson(item, output, depth + 1);
     }
@@ -84,6 +169,7 @@ function walkJson(value: unknown, output: RawProductCandidate[], depth: number):
     const candidate = objectToCandidate(value);
     if (candidate) {
       output.push(candidate);
+      return;
     }
 
     for (const child of Object.values(value as Record<string, unknown>)) {
@@ -92,50 +178,42 @@ function walkJson(value: unknown, output: RawProductCandidate[], depth: number):
   }
 }
 
-function looksLikeProductList(value: unknown[]): boolean {
-  if (value.length === 0) {
-    return false;
-  }
-
-  const sample = value.slice(0, 8);
-  const matches = sample.filter((item) => Boolean(objectToCandidate(item)));
-  return matches.length >= Math.min(2, sample.length);
-}
-
-function objectToCandidate(value: unknown): RawProductCandidate | null {
+function objectToCandidate(value: unknown): RawVideoCandidate | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     return null;
   }
 
-  const object = value as Record<string, unknown>;
-  const title = pickString(object, ["title", "name", "product_name", "goods_name", "commodity_name", "item_title"]);
-  const price = pickString(object, ["price", "min_price", "real_price", "market_price", "discount_price", "sell_price"]);
-  const productId = pickString(object, ["product_id", "goods_id", "commodity_id", "item_id", "sku_id", "id"]);
-  const productUrl = pickString(object, ["url", "link", "schema", "detail_url", "product_url", "jump_url"]);
-  const imageUrl = pickImageUrl(object);
-  const shopName = pickNestedString(object, [
-    "shop_name",
-    "shopName",
-    "shop.title",
-    "shop.name",
-    "seller.name",
-    "store.name",
-  ]);
-  const salesOrHeat = pickString(object, ["sales", "sale_num", "sold_count", "hot_value", "heat", "rank_score"]);
-
-  const signalCount = [title, price, productId, productUrl, imageUrl].filter(Boolean).length;
-  if (signalCount < 2 || (!title && !productUrl)) {
+  const obj = value as Record<string, unknown>;
+  const awemeId = pickString(obj, ["aweme_id"]);
+  if (!awemeId) {
     return null;
   }
 
+  if (typeof obj.statistics !== "object" && typeof obj.author !== "object") {
+    return null;
+  }
+
+  const desc = pickString(obj, ["desc", "item_title", "title"]);
+  if (!desc) {
+    return null;
+  }
+
+  const stats = (obj.statistics as Record<string, unknown> | undefined) ?? {};
+  const author = (obj.author as Record<string, unknown> | undefined) ?? {};
+
   return {
-    productId,
-    title,
-    price,
-    salesOrHeat,
-    shopName,
-    productUrl,
-    imageUrl,
+    awemeId,
+    desc,
+    createTime: pickNumber(obj, ["create_time"]),
+    authorName: pickString(author, ["nickname", "name"]),
+    authorSecUid: pickString(author, ["sec_uid"]),
+    diggCount: pickNumber(stats, ["digg_count"]),
+    commentCount: pickNumber(stats, ["comment_count"]),
+    shareCount: pickNumber(stats, ["share_count"]),
+    collectCount: pickNumber(stats, ["collect_count"]),
+    playCount: pickNumber(stats, ["play_count"]),
+    shareUrl: pickString(obj, ["share_url"]),
+    coverUrl: pickCoverUrl(obj),
     raw: value,
   };
 }
@@ -144,59 +222,36 @@ function pickString(object: Record<string, unknown>, keys: string[]): string {
   for (const key of keys) {
     const value = object[key];
     if (typeof value === "string" || typeof value === "number") {
-      return String(value);
+      const s = String(value);
+      if (s) return s;
     }
   }
-
   return "";
 }
 
-function pickNestedString(object: Record<string, unknown>, keys: string[]): string {
+function pickNumber(object: Record<string, unknown>, keys: string[]): number | undefined {
   for (const key of keys) {
-    if (!key.includes(".")) {
-      const direct = pickString(object, [key]);
-      if (direct) {
-        return direct;
-      }
-      continue;
-    }
-
-    const value = key.split(".").reduce<unknown>((current, part) => {
-      if (!current || typeof current !== "object") {
-        return undefined;
-      }
-      return (current as Record<string, unknown>)[part];
-    }, object);
-
-    if (typeof value === "string" || typeof value === "number") {
-      return String(value);
+    const value = object[key];
+    if (typeof value === "number" && Number.isFinite(value)) return value;
+    if (typeof value === "string") {
+      const n = Number.parseInt(value, 10);
+      if (Number.isFinite(n)) return n;
     }
   }
-
-  return "";
+  return undefined;
 }
 
-function pickImageUrl(object: Record<string, unknown>): string {
-  const direct = pickString(object, ["image", "image_url", "img", "img_url", "cover", "cover_url", "pic_url"]);
-  if (direct) {
-    return direct;
+function pickCoverUrl(object: Record<string, unknown>): string {
+  const video = object.video as Record<string, unknown> | undefined;
+  const cover = video?.cover as Record<string, unknown> | undefined;
+  const urlList = cover?.url_list;
+  if (Array.isArray(urlList) && typeof urlList[0] === "string") {
+    return urlList[0];
   }
-
-  for (const key of ["images", "imgs", "covers", "pic_urls"]) {
-    const value = object[key];
-    if (Array.isArray(value)) {
-      const first = value[0];
-      if (typeof first === "string") {
-        return first;
-      }
-      if (first && typeof first === "object") {
-        const nested = pickString(first as Record<string, unknown>, ["url", "uri", "image_url"]);
-        if (nested) {
-          return nested;
-        }
-      }
-    }
+  const dynamicCover = video?.dynamic_cover as Record<string, unknown> | undefined;
+  const dyList = dynamicCover?.url_list;
+  if (Array.isArray(dyList) && typeof dyList[0] === "string") {
+    return dyList[0];
   }
-
   return "";
 }

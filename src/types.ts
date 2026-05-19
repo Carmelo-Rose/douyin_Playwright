@@ -1,25 +1,33 @@
-export type CaptureSource = "network" | "dom";
-
-export interface ProductRecord {
-  productId: string;
-  title: string;
-  price: string;
-  salesOrHeat: string;
-  shopName: string;
-  productUrl: string;
-  imageUrl: string;
-  source: CaptureSource;
+export interface VideoRecord {
+  awemeId: string;
+  source: string;
+  desc: string;
+  createTime: string;
+  authorName: string;
+  authorSecUid: string;
+  diggCount: number;
+  commentCount: number;
+  shareCount: number;
+  collectCount: number;
+  playCount: number;
+  shareUrl: string;
+  coverUrl: string;
   capturedAt: string;
   rawSnippet: string;
 }
 
-export interface RawProductCandidate {
-  productId?: string;
-  title?: string;
-  price?: string | number;
-  salesOrHeat?: string | number;
-  shopName?: string;
-  productUrl?: string;
-  imageUrl?: string;
+export interface RawVideoCandidate {
+  awemeId?: string;
+  desc?: string;
+  createTime?: number;
+  authorName?: string;
+  authorSecUid?: string;
+  diggCount?: number;
+  commentCount?: number;
+  shareCount?: number;
+  collectCount?: number;
+  playCount?: number;
+  shareUrl?: string;
+  coverUrl?: string;
   raw: unknown;
 }

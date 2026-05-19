@@ -1,74 +1,76 @@
-import type { CaptureSource, ProductRecord, RawProductCandidate } from "./types.js";
+import type { RawVideoCandidate, VideoRecord } from "./types.js";
 
-export function normalizeCandidates(candidates: RawProductCandidate[], source: CaptureSource): ProductRecord[] {
-  const capturedAt = new Date().toISOString();
-  const products = candidates
-    .map((candidate) => normalizeCandidate(candidate, source, capturedAt))
-    .filter((product): product is ProductRecord => Boolean(product));
-
-  return dedupeProducts(products);
+export function normalizeCandidates(candidates: RawVideoCandidate[]): VideoRecord[] {
+  const capturedAt = formatLocalDateTime(new Date());
+  const videos = candidates
+    .map((c) => normalizeCandidate(c, capturedAt))
+    .filter((v): v is VideoRecord => Boolean(v));
+  return dedupeVideos(videos);
 }
 
-export function dedupeProducts(products: ProductRecord[]): ProductRecord[] {
-  const seen = new Set<string>();
-  const result: ProductRecord[] = [];
-
-  for (const product of products) {
-    const key = product.productId || product.productUrl || product.title;
-    if (!key || seen.has(key)) {
+export function dedupeVideos(videos: VideoRecord[]): VideoRecord[] {
+  const seen = new Map<string, VideoRecord>();
+  const out: VideoRecord[] = [];
+  for (const v of videos) {
+    const key = v.awemeId;
+    if (!key) continue;
+    const existing = seen.get(key);
+    if (existing) {
+      existing.source = mergeSource(existing.source, v.source);
       continue;
     }
-
-    seen.add(key);
-    result.push(product);
+    seen.set(key, v);
+    out.push(v);
   }
-
-  return result;
+  return out;
 }
 
-function normalizeCandidate(candidate: RawProductCandidate, source: CaptureSource, capturedAt: string): ProductRecord | null {
-  const title = cleanText(candidate.title);
-  const productUrl = cleanText(candidate.productUrl);
-  const productId = cleanText(candidate.productId) || inferProductId(productUrl);
-
-  if (!title && !productUrl && !productId) {
-    return null;
-  }
+function normalizeCandidate(c: RawVideoCandidate, capturedAt: string): VideoRecord | null {
+  const awemeId = cleanText(c.awemeId);
+  const desc = cleanText(c.desc);
+  if (!awemeId) return null;
+  const shareUrl = cleanText(c.shareUrl) || `https://www.douyin.com/video/${awemeId}`;
 
   return {
-    productId,
-    title,
-    price: normalizePrice(candidate.price),
-    salesOrHeat: cleanText(candidate.salesOrHeat),
-    shopName: cleanText(candidate.shopName),
-    productUrl,
-    imageUrl: cleanText(candidate.imageUrl),
-    source,
+    awemeId,
+    source: "",
+    desc,
+    createTime: c.createTime ? formatLocalDateTime(new Date(c.createTime * 1000)) : "",
+    authorName: cleanText(c.authorName),
+    authorSecUid: cleanText(c.authorSecUid),
+    diggCount: toInt(c.diggCount),
+    commentCount: toInt(c.commentCount),
+    shareCount: toInt(c.shareCount),
+    collectCount: toInt(c.collectCount),
+    playCount: toInt(c.playCount),
+    shareUrl,
+    coverUrl: cleanText(c.coverUrl),
     capturedAt,
-    rawSnippet: toRawSnippet(candidate.raw),
+    rawSnippet: toRawSnippet(c.raw),
   };
 }
 
-export function cleanText(value: unknown): string {
-  if (value === null || value === undefined) {
-    return "";
-  }
+function mergeSource(left: string, right: string): string {
+  const sources = new Set(
+    [...left.split(","), ...right.split(",")]
+      .map((source) => source.trim())
+      .filter(Boolean),
+  );
+  return Array.from(sources).join(",");
+}
 
+export function cleanText(value: unknown): string {
+  if (value === null || value === undefined) return "";
   return String(value).replace(/\s+/g, " ").trim();
 }
 
-function normalizePrice(value: unknown): string {
-  const text = cleanText(value);
-  if (!text) {
-    return "";
+function toInt(value: unknown): number {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string") {
+    const n = Number.parseInt(value, 10);
+    return Number.isFinite(n) ? n : 0;
   }
-
-  return text.startsWith("¥") ? text : text.replace(/^￥/, "¥");
-}
-
-function inferProductId(url: string): string {
-  const match = url.match(/(?:commodity|product|item|goods)[=/_-]?(\d{5,})|\/(\d{8,})(?:[/?#]|$)/i);
-  return match?.[1] || match?.[2] || "";
+  return 0;
 }
 
 function toRawSnippet(raw: unknown): string {
@@ -77,4 +79,21 @@ function toRawSnippet(raw: unknown): string {
   } catch {
     return "";
   }
+}
+
+function formatLocalDateTime(date: Date): string {
+  const pad = (value: number) => String(value).padStart(2, "0");
+  return [
+    date.getFullYear(),
+    "-",
+    pad(date.getMonth() + 1),
+    "-",
+    pad(date.getDate()),
+    " ",
+    pad(date.getHours()),
+    ":",
+    pad(date.getMinutes()),
+    ":",
+    pad(date.getSeconds()),
+  ].join("");
 }

@@ -1,34 +1,36 @@
 import path from "node:path";
 import ExcelJS from "exceljs";
 import fs from "fs-extra";
-import type { ProductRecord } from "./types.js";
+import type { VideoRecord } from "./types.js";
 
-export async function exportProductsToXlsx(products: ProductRecord[], outputDir: string, keyword: string): Promise<string> {
+export async function exportVideosToXlsx(videos: VideoRecord[], outputDir: string, keyword: string): Promise<string> {
   await fs.ensureDir(outputDir);
 
   const workbook = new ExcelJS.Workbook();
   workbook.creator = "douyin_playwright";
   workbook.created = new Date();
 
-  const worksheet = workbook.addWorksheet("products");
+  const worksheet = workbook.addWorksheet("videos");
   worksheet.columns = [
-    { header: "商品ID", key: "productId", width: 24 },
-    { header: "商品名", key: "title", width: 48 },
-    { header: "价格", key: "price", width: 14 },
-    { header: "销量或热度", key: "salesOrHeat", width: 18 },
-    { header: "店铺", key: "shopName", width: 24 },
-    { header: "商品链接", key: "productUrl", width: 60 },
-    { header: "图片链接", key: "imageUrl", width: 60 },
-    { header: "来源", key: "source", width: 10 },
+    { header: "视频ID", key: "awemeId", width: 22 },
+    { header: "来源", key: "source", width: 18 },
+    { header: "标题/描述", key: "desc", width: 60 },
+    { header: "作者", key: "authorName", width: 24 },
+    { header: "发布时间", key: "createTime", width: 24 },
+    { header: "点赞数", key: "diggCount", width: 12 },
+    { header: "评论数", key: "commentCount", width: 12 },
+    { header: "分享数", key: "shareCount", width: 12 },
+    { header: "收藏数", key: "collectCount", width: 12 },
+    { header: "分享链接", key: "shareUrl", width: 50 },
+    { header: "封面链接", key: "coverUrl", width: 60 },
     { header: "抓取时间", key: "capturedAt", width: 24 },
-    { header: "原始片段", key: "rawSnippet", width: 80 },
   ];
 
-  worksheet.addRows(products);
+  worksheet.addRows(videos);
   worksheet.getRow(1).font = { bold: true };
   worksheet.views = [{ state: "frozen", ySplit: 1 }];
 
-  const filename = `douyin-products-${sanitizeFilename(keyword)}-${formatTimestamp(new Date())}.xlsx`;
+  const filename = `douyin-videos-${sanitizeFilename(keyword)}-${formatTimestamp(new Date())}.xlsx`;
   const outputPath = path.join(outputDir, filename);
   await workbook.xlsx.writeFile(outputPath);
 
