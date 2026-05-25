@@ -3,8 +3,9 @@ import process from "node:process";
 import { fileURLToPath } from "node:url";
 import fs from "fs-extra";
 import type { Page, Response } from "playwright";
-import { openBrowserSession, waitForLogin } from "./browser.js";
+import { openBrowserSession } from "./browser.js";
 import { loadConfig } from "./config.js";
+import { waitForDouyinLogin } from "./platforms/douyin/login.js";
 
 const DEFAULT_WAIT_MS = 15_000;
 const RESPONSE_READ_TIMEOUT_MS = 5_000;
@@ -650,7 +651,7 @@ async function main(): Promise<void> {
   const { context, page } = await openBrowserSession(config);
   try {
     console.log("[play-count] checking Douyin login...");
-    await waitForLogin(page, { humanLike: config.humanLike });
+    await waitForDouyinLogin(page, { humanLike: config.humanLike });
     console.log(`[play-count] probing detail page, waitMs=${waitMs}...`);
     const result = await probeVideoPlayCount(page, { awemeId, videoUrl, waitMs });
     const outputPath = await writeProbeResult(result, config.outputDir);

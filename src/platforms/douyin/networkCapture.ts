@@ -1,9 +1,9 @@
 import path from "node:path";
 import process from "node:process";
-import fs from "fs-extra";
 import type { Page, Response } from "playwright";
 import { normalizeCandidates } from "./normalize.js";
-import type { RawVideoCandidate, VideoRecord } from "./types.js";
+import { writeDebugDump } from "../../shared/debugDump.js";
+import type { RawVideoCandidate, VideoRecord } from "../../types.js";
 
 const URL_PREFIX_ALLOW = [
   "/aweme/v1/web/",
@@ -95,12 +95,8 @@ export function attachNetworkCapture(page: Page): NetworkCaptureHandle {
       console.log(`[capture] url=${response.url()} candidates=${candidates.length}`);
       if (dumpsWritten < DEBUG_DUMP_MAX) {
         dumpsWritten += 1;
-        const slug = pathSlug(response.url());
-        const filename = `debug-${Date.now()}-${dumpsWritten}-${slug}.json`;
-        const filepath = path.join(DEBUG_DUMP_DIR, filename);
-        fs.ensureDir(DEBUG_DUMP_DIR)
-          .then(() => fs.writeJson(filepath, { url: response.url(), body: json }, { spaces: 2 }))
-          .then(() => console.log(`[capture] dumped raw response to ${filepath}`))
+        writeDebugDump(DEBUG_DUMP_DIR, "douyin", dumpsWritten, response.url(), json)
+          .then((filepath) => console.log(`[capture] dumped raw response to ${filepath}`))
           .catch((err: unknown) => console.warn(`[capture] dump failed: ${err instanceof Error ? err.message : String(err)}`));
       }
     }
@@ -142,15 +138,6 @@ function isCandidateResponse(response: Response): boolean {
   }
 
   return URL_PREFIX_ALLOW.some((prefix) => url.includes(prefix));
-}
-
-function pathSlug(rawUrl: string): string {
-  try {
-    const parsed = new URL(rawUrl);
-    return parsed.pathname.replace(/^\/+|\/+$/g, "").replace(/\//g, "_").slice(0, 60) || "root";
-  } catch {
-    return "url";
-  }
 }
 
 function walkJson(value: unknown, output: RawVideoCandidate[], depth: number): void {

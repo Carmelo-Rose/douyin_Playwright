@@ -1,4 +1,4 @@
-import type { RawVideoCandidate, VideoRecord } from "./types.js";
+import type { RawVideoCandidate, VideoRecord } from "../../types.js";
 
 export function normalizeCandidates(candidates: RawVideoCandidate[]): VideoRecord[] {
   const capturedAt = formatLocalDateTime(new Date());

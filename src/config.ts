@@ -1,10 +1,12 @@
 import path from "node:path";
 import process from "node:process";
 import dotenv from "dotenv";
+import type { Platform } from "./types.js";
 
 dotenv.config();
 
 export interface AppConfig {
+  platform: Platform;
   keyword: string;
   outputDir: string;
   userDataDir: string;
@@ -12,26 +14,36 @@ export interface AppConfig {
   maxScrolls: number;
   captureTimeoutMs: number;
   maxAgeDays: number;
+  relevanceKeywords: string[];
   userAgent: string;
   browserChannel: string;
   humanLike: boolean;
 }
 
+export type RuntimePlatform = Exclude<Platform, "all">;
+
+interface LoadConfigOptions {
+  defaultPlatform?: Platform;
+}
+
 const DEFAULT_USER_AGENT =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
 
-export function loadConfig(): AppConfig {
+export function loadConfig(options: LoadConfigOptions = {}): AppConfig {
+  const platform = parsePlatform(readCliValue("--platform") || process.env.PLATFORM, options.defaultPlatform ?? "all");
   const cliKeyword = readCliValue("--keyword");
   const keyword = cliKeyword || process.env.KEYWORD || "帽子";
 
   return {
+    platform,
     keyword,
     outputDir: resolveFromCwd(process.env.OUTPUT_DIR || "output"),
-    userDataDir: resolveFromCwd(process.env.USER_DATA_DIR || ".user-data/douyin"),
+    userDataDir: resolveUserDataDir(platform === "all" ? "douyin" : platform, process.env.USER_DATA_DIR),
     headless: parseBoolean(process.env.HEADLESS, false),
     maxScrolls: parsePositiveInt(process.env.MAX_SCROLLS, 8),
     captureTimeoutMs: parsePositiveInt(process.env.CAPTURE_TIMEOUT_MS, 30_000),
     maxAgeDays: parseNonNegativeInt(process.env.MAX_AGE_DAYS, 7),
+    relevanceKeywords: parseRelevanceKeywords(process.env.RELEVANCE_KEYWORDS, keyword),
     userAgent: process.env.USER_AGENT?.trim() || DEFAULT_USER_AGENT,
     browserChannel: process.env.BROWSER_CHANNEL ?? "chrome",
     humanLike: parseBoolean(process.env.HUMAN_LIKE, true),
@@ -49,6 +61,33 @@ function readCliValue(name: string): string | undefined {
 
 function resolveFromCwd(value: string): string {
   return path.isAbsolute(value) ? value : path.resolve(process.cwd(), value);
+}
+
+export function withPlatform(config: AppConfig, platform: RuntimePlatform): AppConfig {
+  return {
+    ...config,
+    platform,
+    userDataDir: resolveUserDataDir(platform, process.env.USER_DATA_DIR),
+  };
+}
+
+function resolveUserDataDir(platform: RuntimePlatform, configured: string | undefined): string {
+  const value = configured?.trim();
+  if (!value) {
+    return resolveFromCwd(`.user-data/${platform}`);
+  }
+
+  const normalized = value.replace(/\\/g, "/").replace(/\/+$/g, "");
+  if (platform === "xhs" && normalized === ".user-data/douyin") {
+    return resolveFromCwd(".user-data/xhs");
+  }
+
+  return resolveFromCwd(value);
+}
+
+function parsePlatform(value: string | undefined, fallback: Platform): Platform {
+  const normalized = value?.trim().toLowerCase();
+  return normalized === "xhs" || normalized === "douyin" || normalized === "all" ? normalized : fallback;
 }
 
 function parseBoolean(value: string | undefined, fallback: boolean): boolean {
@@ -75,4 +114,37 @@ function parseNonNegativeInt(value: string | undefined, fallback: number): numbe
 
   const parsed = Number.parseInt(value, 10);
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
+}
+
+function parseRelevanceKeywords(value: string | undefined, keyword: string): string[] {
+  const configured = (value ?? "")
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+  if (configured.length > 0) {
+    return configured;
+  }
+
+  if (keyword.includes("帽")) {
+    return [
+      keyword,
+      "帽",
+      "帽子",
+      "鸭舌帽",
+      "棒球帽",
+      "遮阳帽",
+      "渔夫帽",
+      "贝雷帽",
+      "毛线帽",
+      "冷帽",
+      "草帽",
+      "礼帽",
+      "针织帽",
+      "MLB",
+      "newera",
+      "NewEra",
+    ];
+  }
+
+  return [keyword];
 }

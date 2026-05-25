@@ -5,7 +5,9 @@
   "main": "dist/index.js",
   "scripts": {
     "capture": "tsx src/index.ts",
+    "probe:xhs": "tsx src/platforms/xhs/probe.ts",
     "probe:play-count": "tsx src/playCountProbe.ts",
+    "probe:deep": "tsx src/playCountDeepProbe.ts",
     "typecheck": "tsc --noEmit",
     "build": "tsc"
   },
