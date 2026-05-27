@@ -46,11 +46,19 @@ export function attachXhsNetworkCapture(page: Page): XhsNetworkCaptureHandle {
   let dumpsWritten = 0;
 
   page.on("response", async (response) => {
-    if (!isCandidateResponse(response) || seenUrls.has(response.url())) {
+    if (!isCandidateResponse(response)) {
       return;
     }
 
-    seenUrls.add(response.url());
+    // 小红书 search/notes 是 POST，翻页游标在请求 body 里、URL 每次都一样。
+    // 只按 URL 去重会让除首页外的所有翻页/筛选响应被丢弃，token 也随之丢失。
+    // 把 postData 纳入去重键，保证每一页结果都被解析。
+    const dedupeKey = `${response.url()}\n${response.request().postData() ?? ""}`;
+    if (seenUrls.has(dedupeKey)) {
+      return;
+    }
+
+    seenUrls.add(dedupeKey);
 
     let json: unknown;
     try {
@@ -153,7 +161,10 @@ function objectToCandidate(value: unknown): RawNoteCandidate | null {
 
   const title = pickString(obj, ["title", "display_title"]) || pickString(noteCard, ["title", "display_title"]);
   const desc = pickString(obj, ["desc", "description"]) || pickString(noteCard, ["desc", "description"]);
-  if (!title && !desc) {
+  const shareUrl = pickString(obj, ["share_url", "shareUrl", "url", "web_url", "webUrl"]) || pickString(noteCard, ["share_url", "shareUrl", "url", "web_url", "webUrl"]);
+  const xsecToken = pickStringDeep(obj, ["xsec_token", "xsecToken"]) || pickStringDeep(noteCard, ["xsec_token", "xsecToken"]);
+  const xsecSource = pickStringDeep(obj, ["xsec_source", "xsecSource"]) || pickStringDeep(noteCard, ["xsec_source", "xsecSource"]);
+  if (!title && !desc && !shareUrl && !xsecToken) {
     return null;
   }
 
@@ -168,7 +179,9 @@ function objectToCandidate(value: unknown): RawNoteCandidate | null {
     likedCount: pickNumber(interact, ["liked_count", "likedCount", "like_count", "likeCount"]),
     commentCount: pickNumber(interact, ["comment_count", "commentCount"]),
     collectCount: pickNumber(interact, ["collected_count", "collectedCount", "collect_count", "collectCount"]),
-    shareUrl: pickString(obj, ["share_url", "shareUrl", "url"]) || pickString(noteCard, ["share_url", "shareUrl", "url"]),
+    shareUrl,
+    xsecToken,
+    xsecSource,
     coverUrl: pickCoverUrl(obj) || pickCoverUrl(noteCard),
     raw: value,
   };
@@ -211,6 +224,22 @@ function pickString(object: Record<string, unknown> | undefined, keys: string[])
       if (s) return s;
     }
   }
+  return "";
+}
+
+function pickStringDeep(object: Record<string, unknown> | undefined, keys: string[], depth = 0): string {
+  if (!object || depth > 5) return "";
+
+  const direct = pickString(object, keys);
+  if (direct) return direct;
+
+  for (const value of Object.values(object)) {
+    if (value && typeof value === "object" && !Array.isArray(value)) {
+      const nested = pickStringDeep(value as Record<string, unknown>, keys, depth + 1);
+      if (nested) return nested;
+    }
+  }
+
   return "";
 }
 

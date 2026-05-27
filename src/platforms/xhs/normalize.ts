@@ -19,6 +19,7 @@ export function dedupeNotes(notes: NoteRecord[]): NoteRecord[] {
     const existing = seen.get(note.noteId);
     if (existing) {
       existing.source = mergeSource(existing.source, note.source);
+      mergeBetterNoteFields(existing, note);
       continue;
     }
     seen.set(note.noteId, note);
@@ -34,6 +35,8 @@ function normalizeNoteCandidate(candidate: RawNoteCandidate, capturedAt: string)
     return null;
   }
 
+  const shareUrl = buildXhsShareUrl(noteId, candidate);
+
   return {
     noteId,
     source: "",
@@ -46,11 +49,76 @@ function normalizeNoteCandidate(candidate: RawNoteCandidate, capturedAt: string)
     likedCount: toInt(candidate.likedCount),
     commentCount: toInt(candidate.commentCount),
     collectCount: toInt(candidate.collectCount),
-    shareUrl: cleanText(candidate.shareUrl) || `https://www.xiaohongshu.com/explore/${noteId}`,
+    shareUrl,
+    linkStatus: describeXhsLinkStatus(shareUrl),
     coverUrl: cleanText(candidate.coverUrl),
     capturedAt,
     rawSnippet: toRawSnippet(candidate.raw),
   };
+}
+
+function mergeBetterNoteFields(target: NoteRecord, candidate: NoteRecord): void {
+  if (scoreXhsShareUrl(candidate.shareUrl) > scoreXhsShareUrl(target.shareUrl)) {
+    target.shareUrl = candidate.shareUrl;
+    target.linkStatus = candidate.linkStatus;
+  }
+
+  if (!target.coverUrl && candidate.coverUrl) {
+    target.coverUrl = candidate.coverUrl;
+  }
+  if (!target.authorName && candidate.authorName) {
+    target.authorName = candidate.authorName;
+  }
+  if (!target.authorId && candidate.authorId) {
+    target.authorId = candidate.authorId;
+  }
+  if (!target.title && candidate.title) {
+    target.title = candidate.title;
+  }
+  if (!target.desc && candidate.desc) {
+    target.desc = candidate.desc;
+  }
+  if (!target.createTime && candidate.createTime) {
+    target.createTime = candidate.createTime;
+  }
+}
+
+function buildXhsShareUrl(noteId: string, candidate: RawNoteCandidate): string {
+  const rawUrl = cleanText(candidate.shareUrl);
+  const url = rawUrl || `https://www.xiaohongshu.com/explore/${noteId}`;
+  const token = cleanText(candidate.xsecToken);
+  const source = cleanText(candidate.xsecSource) || "pc_search";
+
+  if (!token || url.includes("xsec_token=")) {
+    return url;
+  }
+
+  try {
+    const parsed = new URL(url, "https://www.xiaohongshu.com");
+    parsed.searchParams.set("xsec_token", token);
+    parsed.searchParams.set("xsec_source", source);
+    return parsed.toString();
+  } catch {
+    const separator = url.includes("?") ? "&" : "?";
+    return `${url}${separator}xsec_token=${encodeURIComponent(token)}&xsec_source=${encodeURIComponent(source)}`;
+  }
+}
+
+function describeXhsLinkStatus(url: string): string {
+  if (url.includes("xsec_token=")) {
+    return "优先打开链接";
+  }
+  return "裸链接，PC可能受限";
+}
+
+function scoreXhsShareUrl(url: string): number {
+  let score = 0;
+  if (url.startsWith("https://www.xiaohongshu.com/")) score += 1;
+  if (url.includes("/explore/")) score += 1;
+  if (url.includes("?")) score += 1;
+  if (url.includes("xsec_source=")) score += 2;
+  if (url.includes("xsec_token=")) score += 5;
+  return score;
 }
 
 function mergeSource(left: string, right: string): string {

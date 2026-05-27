@@ -31,6 +31,7 @@ export interface NoteRecord {
   commentCount: number;
   collectCount: number;
   shareUrl: string;
+  linkStatus: string;
   coverUrl: string;
   capturedAt: string;
   rawSnippet: string;
@@ -64,6 +65,8 @@ export interface RawNoteCandidate {
   commentCount?: number;
   collectCount?: number;
   shareUrl?: string;
+  xsecToken?: string;
+  xsecSource?: string;
   coverUrl?: string;
   raw: unknown;
 }

@@ -525,6 +525,7 @@ async function scrapeVisibleXhsNotes(page: Page): Promise<NoteRecord[]> {
         commentCount: 0,
         collectCount: 0,
         shareUrl: href,
+        linkStatus: href.includes("xsec_token=") ? "优先打开链接" : "裸链接，PC可能受限",
         coverUrl: pickImageUrl(card || anchor),
         capturedAt: capturedAtValue,
         rawSnippet: lines.join(" | ").slice(0, 500),
