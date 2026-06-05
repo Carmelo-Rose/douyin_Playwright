@@ -1,4 +1,5 @@
 import type { NoteRecord, RawNoteCandidate } from "../../types.js";
+import { normalizeImageUrlList } from "../../shared/imageUrls.js";
 
 export function normalizeNoteCandidates(candidates: RawNoteCandidate[]): NoteRecord[] {
   const capturedAt = formatLocalDateTime(new Date());
@@ -52,6 +53,8 @@ function normalizeNoteCandidate(candidate: RawNoteCandidate, capturedAt: string)
     shareUrl,
     linkStatus: describeXhsLinkStatus(shareUrl),
     coverUrl: cleanText(candidate.coverUrl),
+    imageUrls: normalizeImageUrls(candidate.imageUrls, candidate.coverUrl),
+    detailImageStatus: "",
     capturedAt,
     rawSnippet: toRawSnippet(candidate.raw),
   };
@@ -65,6 +68,12 @@ function mergeBetterNoteFields(target: NoteRecord, candidate: NoteRecord): void 
 
   if (!target.coverUrl && candidate.coverUrl) {
     target.coverUrl = candidate.coverUrl;
+  }
+  if (candidate.imageUrls.length > target.imageUrls.length) {
+    target.imageUrls = candidate.imageUrls;
+  }
+  if (!target.detailImageStatus && candidate.detailImageStatus) {
+    target.detailImageStatus = candidate.detailImageStatus;
   }
   if (!target.authorName && candidate.authorName) {
     target.authorName = candidate.authorName;
@@ -287,6 +296,12 @@ function toRawSnippet(raw: unknown): string {
   } catch {
     return "";
   }
+}
+
+function normalizeImageUrls(values: unknown, coverUrl: unknown): string[] {
+  const urls = Array.isArray(values) ? values.map(cleanText).filter(Boolean) : [];
+  const cover = cleanText(coverUrl);
+  return normalizeImageUrlList([cover, ...urls]);
 }
 
 function formatLocalDateTime(date: Date): string {

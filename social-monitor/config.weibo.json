@@ -1,0 +1,27 @@
+{
+  "searchQueries": [
+    "#明星帽子look#",
+    "#明星同款帽子#",
+    "杨幂 帽子",
+    "赵丽颖 帽子",
+    "王一博 帽子",
+    "虞书欣 帽子",
+    "鞠婧祎 帽子",
+    "白鹿 帽子",
+    "赵露思 帽子",
+    "王鹤棣 帽子"
+  ],
+  "relevanceKeywords": ["明星", "帽子", "戴帽子", "机场", "同款"],
+  "excludeKeywords": ["扣帽子", "帽子叔叔", "学士帽", "巫婆帽", "绿帽子", "戴高帽", "安全帽", "小说", "超话签到"],
+  "maxScrolls": 5,
+  "captureTimeoutMs": 15000,
+  "headless": false,
+  "browserChannel": "chrome",
+  "userDataDir": ".user-data/weibo-monitor",
+  "outputDir": "output",
+  "realtime": false,
+  "recentDays": 7,
+  "requireKeywordMatch": false,
+  "requireImage": true,
+  "queryDelayMs": 4000
+}

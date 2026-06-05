@@ -4,3 +4,4 @@ output/
 .user-data/
 .env
 .DS_Store
+social-monitor/.state/

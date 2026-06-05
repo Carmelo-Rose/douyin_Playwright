@@ -16,7 +16,7 @@ export function dedupeVideos(videos: VideoRecord[]): VideoRecord[] {
     if (!key) continue;
     const existing = seen.get(key);
     if (existing) {
-      existing.source = mergeSource(existing.source, v.source);
+      mergeVideoRecord(existing, v);
       continue;
     }
     seen.set(key, v);
@@ -25,11 +25,54 @@ export function dedupeVideos(videos: VideoRecord[]): VideoRecord[] {
   return out;
 }
 
+function mergeVideoRecord(target: VideoRecord, candidate: VideoRecord): void {
+  target.source = mergeSource(target.source, candidate.source);
+
+  if (isBetterDate(candidate.createTime, target.createTime)) {
+    target.createTime = candidate.createTime;
+  }
+  if (!target.desc && candidate.desc) target.desc = candidate.desc;
+  if (!target.authorName && candidate.authorName) target.authorName = candidate.authorName;
+  if (!target.authorSecUid && candidate.authorSecUid) target.authorSecUid = candidate.authorSecUid;
+  if (!target.shareUrl.includes("/note/") && candidate.shareUrl.includes("/note/")) {
+    target.shareUrl = candidate.shareUrl;
+  }
+  if (!target.coverUrl && candidate.coverUrl) {
+    target.coverUrl = candidate.coverUrl;
+  }
+  if (candidate.imageUrls.length > target.imageUrls.length) {
+    target.imageUrls = candidate.imageUrls;
+  }
+
+  target.diggCount = Math.max(target.diggCount, candidate.diggCount);
+  target.commentCount = Math.max(target.commentCount, candidate.commentCount);
+  target.shareCount = Math.max(target.shareCount, candidate.shareCount);
+  target.collectCount = Math.max(target.collectCount, candidate.collectCount);
+  target.playCount = Math.max(target.playCount, candidate.playCount);
+}
+
+function isBetterDate(candidate: string, current: string): boolean {
+  const candidateTime = Date.parse(candidate);
+  const currentTime = Date.parse(current);
+  if (!Number.isFinite(candidateTime)) {
+    return false;
+  }
+  if (!Number.isFinite(currentTime)) {
+    return true;
+  }
+  return candidateTime > currentTime;
+}
+
 function normalizeCandidate(c: RawVideoCandidate, capturedAt: string): VideoRecord | null {
   const awemeId = cleanText(c.awemeId);
   const desc = cleanText(c.desc);
   if (!awemeId) return null;
-  const shareUrl = cleanText(c.shareUrl) || `https://www.douyin.com/video/${awemeId}`;
+  const isImagePost = c.isImagePost === true;
+  const imageUrls = isImagePost ? normalizeImageUrls(c.imageUrls) : [];
+  const rawShareUrl = cleanText(c.shareUrl);
+  const shareUrl = isImagePost
+    ? rawShareUrl.includes("/note/") ? rawShareUrl : `https://www.douyin.com/note/${awemeId}`
+    : rawShareUrl || `https://www.douyin.com/video/${awemeId}`;
 
   return {
     awemeId,
@@ -45,6 +88,8 @@ function normalizeCandidate(c: RawVideoCandidate, capturedAt: string): VideoReco
     playCount: toInt(c.playCount),
     shareUrl,
     coverUrl: cleanText(c.coverUrl),
+    imageUrls,
+    detailImageStatus: "",
     capturedAt,
     rawSnippet: toRawSnippet(c.raw),
   };
@@ -79,6 +124,18 @@ function toRawSnippet(raw: unknown): string {
   } catch {
     return "";
   }
+}
+
+function normalizeImageUrls(values: unknown): string[] {
+  const urls = Array.isArray(values) ? values.map(cleanText).filter(Boolean) : [];
+  const seen = new Set<string>();
+  return urls.filter((url) => {
+    if (!url || seen.has(url)) {
+      return false;
+    }
+    seen.add(url);
+    return true;
+  });
 }
 
 function formatLocalDateTime(date: Date): string {

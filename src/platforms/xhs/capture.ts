@@ -3,10 +3,12 @@ import { openBrowserSession } from "../../browser.js";
 import type { AppConfig } from "../../config.js";
 import { exportNotesToXlsx } from "../../exportXlsx.js";
 import { humanScroll, maybeReadingPause, randomBetween, sleep } from "../../human.js";
-import type { NoteRecord } from "../../types.js";
+import type { ContentType, NoteRecord } from "../../types.js";
 import { waitForXhsLogin } from "./login.js";
 import { attachXhsNetworkCapture, type XhsNetworkCaptureHandle } from "./networkCapture.js";
 import { dedupeNotes, formatCreateTimeFromNoteId, resolveXhsDisplayDateStable } from "./normalize.js";
+import { enrichXhsDetailImages } from "./detailImages.js";
+import { scoreXhsVisualQuality } from "./visualFilter.js";
 
 const XHS_SEARCH_URL = "https://www.xiaohongshu.com/search_result";
 const XHS_TEXT = {
@@ -14,6 +16,7 @@ const XHS_TEXT = {
   filtered: "\u5df2\u7b5b\u9009",
   latest: "\u6700\u65b0",
   video: "\u89c6\u9891",
+  image: "\u56fe\u6587",
   week: "\u4e00\u5468\u5185",
   collapse: "\u6536\u8d77",
 };
@@ -45,13 +48,13 @@ export async function captureXhs(config: AppConfig): Promise<void> {
 
     const notes = await captureXhsSearch(page, capture, config);
     const uniqueNotes = dedupeNotes(notes);
-    const videoNotes = filterVideoNotes(uniqueNotes);
-    const recentNotes = filterByMaxAgeDays(videoNotes, config.maxAgeDays);
+    const typedNotes = filterNotesByContentType(uniqueNotes, config.contentType);
+    const recentNotes = filterByMaxAgeDays(typedNotes, config.maxAgeDays);
     const deduped = filterByRelevance(recentNotes, config.relevanceKeywords);
 
     if (deduped.length === 0) {
       console.warn(
-        `No Xiaohongshu notes left to export. raw=${notes.length}, deduped=${uniqueNotes.length}, video=${videoNotes.length}, recent=${recentNotes.length}, relevant=${deduped.length}.`,
+        `No Xiaohongshu notes left to export. raw=${notes.length}, deduped=${uniqueNotes.length}, ${config.contentType}=${typedNotes.length}, recent=${recentNotes.length}, relevant=${deduped.length}.`,
       );
       if (notes.length === 0) {
         console.warn("No Xiaohongshu note records were recognized from network responses. Run DEBUG_CAPTURE=true npm run probe:xhs to inspect output/debug-xhs-*.json.");
@@ -59,8 +62,10 @@ export async function captureXhs(config: AppConfig): Promise<void> {
       return;
     }
 
-    const outputPath = await exportNotesToXlsx(deduped, config.outputDir, config.keyword);
-    console.log(`Exported ${deduped.length} notes to ${outputPath}`);
+    const enrichedNotes = await enrichXhsDetailImages(page, deduped, config);
+    const scoredNotes = await scoreXhsVisualQuality(enrichedNotes, config);
+    const outputPath = await exportNotesToXlsx(scoredNotes, config.outputDir, config.keyword);
+    console.log(`Exported ${scoredNotes.length} notes to ${outputPath}`);
   } finally {
     await context.close();
   }
@@ -69,12 +74,12 @@ export async function captureXhs(config: AppConfig): Promise<void> {
 async function captureXhsSearch(page: Page, capture: XhsNetworkCaptureHandle, config: AppConfig): Promise<NoteRecord[]> {
   capture.reset();
   await openXhsSearch(page, config.keyword);
-  await applyXhsSearchFiltersStable(page);
+  await applyXhsSearchFiltersStable(page, config.contentType);
   await collectByScrolling(page, config);
   const networkNotes = capture.getNotes().map((note) => ({ ...note, source: "xhs_search" }));
   // DOM 笔记的 createTime 此时是"原始日期文案"（如 "04-03" / "553天前" / ""）。
   // 在 Node 侧换算成标准时间；换算不出再用 noteId(ObjectId) 兜底；都不行才留空。
-  const domNotes = (await scrapeVisibleXhsNotes(page)).map((note) => ({
+  const domNotes = (await scrapeVisibleXhsNotes(page, config.contentType)).map((note) => ({
     ...note,
     authorName: isClockOnlyText(note.authorName) ? "" : note.authorName,
     createTime: formatCreateTimeFromNoteId(note.noteId) || resolveXhsDisplayDateStable(note.createTime),
@@ -84,7 +89,7 @@ async function captureXhsSearch(page: Page, capture: XhsNetworkCaptureHandle, co
   return notes;
 }
 
-async function applyXhsSearchFiltersStable(page: Page): Promise<void> {
+async function applyXhsSearchFiltersStable(page: Page, contentType: ContentType): Promise<void> {
   await page.waitForTimeout(1_500);
   await waitIfCaptcha(page);
 
@@ -109,14 +114,15 @@ async function applyXhsSearchFiltersStable(page: Page): Promise<void> {
   }
 
   const latest = await clickXhsPanelOption(page, XHS_PANEL_TEXT.sortBy, XHS_TEXT.latest);
-  const video = await clickXhsPanelOption(page, XHS_PANEL_TEXT.noteType, XHS_TEXT.video);
+  const contentLabel = contentType === "image" ? XHS_TEXT.image : XHS_TEXT.video;
+  const content = await clickXhsPanelOption(page, XHS_PANEL_TEXT.noteType, contentLabel);
   const week = await clickXhsPanelOption(page, XHS_PANEL_TEXT.publishTime, XHS_TEXT.week);
 
-  if (!latest || !video || !week) {
-    console.warn(`Xiaohongshu filters partially applied: latest=${latest}, video=${video}, week=${week}.`);
+  if (!latest || !content || !week) {
+    console.warn(`Xiaohongshu filters partially applied: latest=${latest}, ${contentType}=${content}, week=${week}.`);
     await logVisibleFilterCandidates(page);
   } else {
-    console.log("Applied Xiaohongshu filters: latest / video / one week.");
+    console.log(`Applied Xiaohongshu filters: latest / ${contentType} / one week.`);
   }
 
   const closed = await clickVisibleText(page, [XHS_TEXT.collapse], 1_500);
@@ -461,8 +467,8 @@ async function submitXhsSearchInput(page: Page, input: Locator, keyword: string)
   return false;
 }
 
-export async function applyXhsSearchFilters(page: Page): Promise<void> {
-  await applyXhsSearchFiltersStable(page);
+export async function applyXhsSearchFilters(page: Page, contentType: ContentType = "image"): Promise<void> {
+  await applyXhsSearchFiltersStable(page, contentType);
 }
 
 async function collectByScrolling(page: Page, config: AppConfig): Promise<void> {
@@ -485,9 +491,9 @@ async function collectByScrolling(page: Page, config: AppConfig): Promise<void> 
   await waitIfCaptcha(page);
 }
 
-async function scrapeVisibleXhsNotes(page: Page): Promise<NoteRecord[]> {
+async function scrapeVisibleXhsNotes(page: Page, contentType: ContentType): Promise<NoteRecord[]> {
   const capturedAt = formatLocalDateTime(new Date());
-  return page.evaluate((capturedAtValue) => {
+  return page.evaluate(({ capturedAtValue, noteType }) => {
     const anchors = Array.from(document.querySelectorAll<HTMLAnchorElement>('a[href*="/explore/"]'));
     const seen = new Set<string>();
     const notes: NoteRecord[] = [];
@@ -511,11 +517,12 @@ async function scrapeVisibleXhsNotes(page: Page): Promise<NoteRecord[]> {
       // 箭头函数的换算逻辑会被 esbuild 注入 __name 包装而在浏览器里报错。
       const createTime = dateInfo.raw;
       const likedCount = pickCount(lines);
+      const coverUrl = pickImageUrl(card || anchor);
 
       notes.push({
         noteId,
         source: "xhs_dom",
-        noteType: "video",
+        noteType,
         title,
         desc: title,
         createTime,
@@ -526,7 +533,9 @@ async function scrapeVisibleXhsNotes(page: Page): Promise<NoteRecord[]> {
         collectCount: 0,
         shareUrl: href,
         linkStatus: href.includes("xsec_token=") ? "优先打开链接" : "裸链接，PC可能受限",
-        coverUrl: pickImageUrl(card || anchor),
+        coverUrl,
+        imageUrls: coverUrl ? [coverUrl] : [],
+        detailImageStatus: "",
         capturedAt: capturedAtValue,
         rawSnippet: lines.join(" | ").slice(0, 500),
       });
@@ -663,7 +672,7 @@ async function scrapeVisibleXhsNotes(page: Page): Promise<NoteRecord[]> {
       const image = root.querySelector<HTMLImageElement>("img");
       return image?.currentSrc || image?.src || "";
     }
-  }, capturedAt);
+  }, { capturedAtValue: capturedAt, noteType: contentType === "image" ? "normal" : "video" });
 }
 
 async function clickVisibleText(page: Page, texts: string[], timeoutMs: number): Promise<boolean> {
@@ -795,21 +804,24 @@ async function waitIfCaptcha(page: Page): Promise<void> {
   throw new Error("Xiaohongshu verification was not solved within 5 minutes.");
 }
 
-function filterVideoNotes(notes: NoteRecord[]): NoteRecord[] {
+function filterNotesByContentType(notes: NoteRecord[], contentType: ContentType): NoteRecord[] {
   const filtered = notes.filter((note) => {
     const type = note.noteType.trim().toLowerCase();
-    return type.includes("video");
+    if (contentType === "video") {
+      return type.includes("video");
+    }
+    return type.includes("normal") || type.includes("image") || type.includes("photo") || type.includes("图文");
   });
 
   if (filtered.length === 0 && notes.length > 0) {
     const untyped = notes.filter((note) => !note.noteType.trim());
     if (untyped.length > 0) {
-      console.warn(`No explicit Xiaohongshu video note types were detected. Keeping ${untyped.length}/${notes.length} untyped notes instead of exporting nothing.`);
+      console.warn(`No explicit Xiaohongshu ${contentType} note types were detected. Keeping ${untyped.length}/${notes.length} untyped notes instead of exporting nothing.`);
       return untyped;
     }
   }
 
-  console.log(`Kept ${filtered.length}/${notes.length} Xiaohongshu notes matching video type.`);
+  console.log(`Kept ${filtered.length}/${notes.length} Xiaohongshu notes matching ${contentType} type.`);
   return filtered;
 }
 

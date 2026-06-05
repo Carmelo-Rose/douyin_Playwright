@@ -1,4 +1,5 @@
 export type Platform = "douyin" | "xhs" | "all";
+export type ContentType = "image" | "video";
 
 export interface VideoRecord {
   awemeId: string;
@@ -14,6 +15,8 @@ export interface VideoRecord {
   playCount: number;
   shareUrl: string;
   coverUrl: string;
+  imageUrls: string[];
+  detailImageStatus: string;
   capturedAt: string;
   rawSnippet: string;
 }
@@ -33,12 +36,23 @@ export interface NoteRecord {
   shareUrl: string;
   linkStatus: string;
   coverUrl: string;
+  imageUrls: string[];
+  detailImageStatus: string;
+  visualQualified?: string;
+  visualScore?: number;
+  visualReason?: string;
+  visualHatType?: string;
+  visualStatus?: string;
+  visualAnalyzedImages?: string;
   capturedAt: string;
   rawSnippet: string;
 }
 
 export interface RawVideoCandidate {
   awemeId?: string;
+  awemeType?: number;
+  mediaType?: number;
+  isImagePost?: boolean;
   desc?: string;
   createTime?: number;
   authorName?: string;
@@ -50,6 +64,7 @@ export interface RawVideoCandidate {
   playCount?: number;
   shareUrl?: string;
   coverUrl?: string;
+  imageUrls?: string[];
   raw: unknown;
 }
 
@@ -68,5 +83,6 @@ export interface RawNoteCandidate {
   xsecToken?: string;
   xsecSource?: string;
   coverUrl?: string;
+  imageUrls?: string[];
   raw: unknown;
 }

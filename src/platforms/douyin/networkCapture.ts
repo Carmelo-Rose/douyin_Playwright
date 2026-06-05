@@ -3,7 +3,7 @@ import process from "node:process";
 import type { Page, Response } from "playwright";
 import { normalizeCandidates } from "./normalize.js";
 import { writeDebugDump } from "../../shared/debugDump.js";
-import type { RawVideoCandidate, VideoRecord } from "../../types.js";
+import type { ContentType, RawVideoCandidate, VideoRecord } from "../../types.js";
 
 const URL_PREFIX_ALLOW = [
   "/aweme/v1/web/",
@@ -59,12 +59,18 @@ const DEBUG_DUMP_MAX = 15;
 
 export interface NetworkCaptureHandle {
   getVideos: () => VideoRecord[];
+  flush: () => Promise<void>;
   reset: () => void;
 }
 
-export function attachNetworkCapture(page: Page): NetworkCaptureHandle {
+interface NetworkCaptureOptions {
+  contentType?: ContentType;
+}
+
+export function attachNetworkCapture(page: Page, options: NetworkCaptureOptions = {}): NetworkCaptureHandle {
   const videos: VideoRecord[] = [];
   const seenUrls = new Set<string>();
+  const pendingResponses = new Set<Promise<void>>();
   let dumpsWritten = 0;
 
   page.on("response", async (response) => {
@@ -83,28 +89,36 @@ export function attachNetworkCapture(page: Page): NetworkCaptureHandle {
 
     seenUrls.add(response.url());
 
-    let json: unknown;
-    try {
-      json = await response.json();
-    } catch {
-      return;
-    }
-
-    const candidates = extractCandidatesFromJson(json);
-    if (DEBUG) {
-      console.log(`[capture] url=${response.url()} candidates=${candidates.length}`);
-      if (dumpsWritten < DEBUG_DUMP_MAX) {
-        dumpsWritten += 1;
-        writeDebugDump(DEBUG_DUMP_DIR, "douyin", dumpsWritten, response.url(), json)
-          .then((filepath) => console.log(`[capture] dumped raw response to ${filepath}`))
-          .catch((err: unknown) => console.warn(`[capture] dump failed: ${err instanceof Error ? err.message : String(err)}`));
+    const task = (async () => {
+      const payloads = await readResponsePayloads(response);
+      if (payloads.length === 0) {
+        return;
       }
-    }
-    videos.push(...normalizeCandidates(candidates));
+
+      const candidates = payloads.flatMap((payload) => extractCandidatesFromJson(payload, options.contentType));
+      if (DEBUG) {
+        console.log(`[capture] url=${response.url()} payloads=${payloads.length} candidates=${candidates.length}`);
+        if (dumpsWritten < DEBUG_DUMP_MAX) {
+          dumpsWritten += 1;
+          writeDebugDump(DEBUG_DUMP_DIR, "douyin", dumpsWritten, response.url(), payloads.length === 1 ? payloads[0] : payloads)
+            .then((filepath) => console.log(`[capture] dumped raw response to ${filepath}`))
+            .catch((err: unknown) => console.warn(`[capture] dump failed: ${err instanceof Error ? err.message : String(err)}`));
+        }
+      }
+      videos.push(...normalizeCandidates(candidates));
+    })();
+
+    pendingResponses.add(task);
+    task.finally(() => pendingResponses.delete(task)).catch(() => undefined);
   });
 
   return {
     getVideos: () => videos,
+    flush: async () => {
+      while (pendingResponses.size > 0) {
+        await Promise.allSettled(Array.from(pendingResponses));
+      }
+    },
     reset: () => {
       videos.length = 0;
       seenUrls.clear();
@@ -115,9 +129,60 @@ export function attachNetworkCapture(page: Page): NetworkCaptureHandle {
   };
 }
 
-export function extractCandidatesFromJson(json: unknown): RawVideoCandidate[] {
+async function readResponsePayloads(response: Response): Promise<unknown[]> {
+  let text: string;
+  try {
+    text = await response.text();
+  } catch {
+    return [];
+  }
+
+  return parseJsonPayloads(text);
+}
+
+function parseJsonPayloads(text: string): unknown[] {
+  const trimmed = text.trim();
+  if (!trimmed) {
+    return [];
+  }
+
+  const direct = tryParseJson(trimmed);
+  if (direct !== undefined) {
+    return [direct];
+  }
+
+  const payloads: unknown[] = [];
+  for (const rawLine of trimmed.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line) {
+      continue;
+    }
+
+    const candidate = line.startsWith("data:") ? line.slice("data:".length).trim() : line;
+    if (!candidate || candidate === "[DONE]") {
+      continue;
+    }
+
+    const parsed = tryParseJson(candidate);
+    if (parsed !== undefined) {
+      payloads.push(parsed);
+    }
+  }
+
+  return payloads;
+}
+
+function tryParseJson(value: string): unknown | undefined {
+  try {
+    return JSON.parse(value);
+  } catch {
+    return undefined;
+  }
+}
+
+export function extractCandidatesFromJson(json: unknown, contentType?: ContentType): RawVideoCandidate[] {
   const candidates: RawVideoCandidate[] = [];
-  walkJson(json, candidates, 0);
+  walkJson(json, candidates, 0, contentType);
   return candidates;
 }
 
@@ -140,32 +205,32 @@ function isCandidateResponse(response: Response): boolean {
   return URL_PREFIX_ALLOW.some((prefix) => url.includes(prefix));
 }
 
-function walkJson(value: unknown, output: RawVideoCandidate[], depth: number): void {
+function walkJson(value: unknown, output: RawVideoCandidate[], depth: number, contentType?: ContentType): void {
   if (depth > 14 || value === null || value === undefined) {
     return;
   }
 
   if (Array.isArray(value)) {
     for (const item of value) {
-      walkJson(item, output, depth + 1);
+      walkJson(item, output, depth + 1, contentType);
     }
     return;
   }
 
   if (typeof value === "object") {
-    const candidate = objectToCandidate(value);
+    const candidate = objectToCandidate(value, contentType);
     if (candidate) {
       output.push(candidate);
       return;
     }
 
     for (const child of Object.values(value as Record<string, unknown>)) {
-      walkJson(child, output, depth + 1);
+      walkJson(child, output, depth + 1, contentType);
     }
   }
 }
 
-function objectToCandidate(value: unknown): RawVideoCandidate | null {
+function objectToCandidate(value: unknown, contentType?: ContentType): RawVideoCandidate | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     return null;
   }
@@ -185,11 +250,27 @@ function objectToCandidate(value: unknown): RawVideoCandidate | null {
     return null;
   }
 
+  const shareInfo = (obj.share_info as Record<string, unknown> | undefined) ?? {};
+  const shareUrl = pickString(obj, ["share_url"]) || pickString(shareInfo, ["share_url", "url"]);
+  const awemeType = pickNumber(obj, ["aweme_type"]);
+  const mediaType = pickNumber(obj, ["media_type"]);
+  const imageUrls = pickImagePostUrls(obj);
+  const isImagePost = isImageAweme(obj, imageUrls, shareUrl);
+  if (contentType === "image" && !isImagePost) {
+    return null;
+  }
+  if (contentType === "video" && isImagePost) {
+    return null;
+  }
+
   const stats = (obj.statistics as Record<string, unknown> | undefined) ?? {};
   const author = (obj.author as Record<string, unknown> | undefined) ?? {};
 
   return {
     awemeId,
+    awemeType,
+    mediaType,
+    isImagePost,
     desc,
     createTime: pickNumber(obj, ["create_time"]),
     authorName: pickString(author, ["nickname", "name"]),
@@ -199,8 +280,9 @@ function objectToCandidate(value: unknown): RawVideoCandidate | null {
     shareCount: pickNumber(stats, ["share_count"]),
     collectCount: pickNumber(stats, ["collect_count"]),
     playCount: pickNumber(stats, ["play_count"]),
-    shareUrl: pickString(obj, ["share_url"]),
-    coverUrl: pickCoverUrl(obj),
+    shareUrl,
+    coverUrl: isImagePost ? imageUrls[0] || pickCoverUrl(obj) : pickCoverUrl(obj),
+    imageUrls: isImagePost ? imageUrls : [],
     raw: value,
   };
 }
@@ -241,4 +323,70 @@ function pickCoverUrl(object: Record<string, unknown>): string {
     return dyList[0];
   }
   return "";
+}
+
+function pickImagePostUrls(object: Record<string, unknown>): string[] {
+  const imageLists = [object.images, object.image_list, object.original_images].filter(Array.isArray) as unknown[][];
+  const urls: string[] = [];
+  const seen = new Set<string>();
+  for (const images of imageLists) {
+    for (const image of images) {
+      const url = pickImageUrlFromImage(image);
+      if (url && !seen.has(url)) {
+        seen.add(url);
+        urls.push(url);
+      }
+    }
+    if (urls.length > 0) {
+      break;
+    }
+  }
+  return urls;
+}
+
+function pickImageUrlFromImage(value: unknown): string {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return "";
+  }
+  const object = value as Record<string, unknown>;
+  for (const key of ["url_list", "urlList", "watermark_free_download_url_list", "download_url_list"]) {
+    const list = object[key];
+    if (!Array.isArray(list)) {
+      continue;
+    }
+    const url = list.find((item): item is string => typeof item === "string" && looksLikeImageUrl(item));
+    if (url) {
+      return url;
+    }
+  }
+  const directUrl = pickString(object, ["url"]);
+  return directUrl && looksLikeImageUrl(directUrl) ? directUrl : "";
+}
+
+function isImageAweme(object: Record<string, unknown>, imageUrls: string[], shareUrl: string): boolean {
+  return (
+    pickNumber(object, ["aweme_type"]) === 68 ||
+    pickNumber(object, ["media_type"]) === 2 ||
+    object.is_slides === true ||
+    imageUrls.length > 0 ||
+    shareUrl.includes("/note/")
+  );
+}
+
+function looksLikeImageUrl(value: string): boolean {
+  const url = value.trim();
+  const lowerUrl = url.toLowerCase();
+  if (!/^https?:\/\//i.test(url)) {
+    return false;
+  }
+  if (!["douyinpic.com", "byteimg.com", "pstatp.com", "douyinstatic.com"].some((host) => lowerUrl.includes(host))) {
+    return false;
+  }
+  if (/\.(mp4|webm|mov|m3u8|mp3|m4a|aac|wav)(?:[?#]|$)/i.test(lowerUrl)) {
+    return false;
+  }
+  if (["avatar", "author", "user", "music", "emoji", "sticker", "icon", "logo", "watermark"].some((hint) => lowerUrl.includes(`/${hint}`))) {
+    return false;
+  }
+  return /\.(jpe?g|png|webp)(?:[?#]|$)/i.test(lowerUrl) || lowerUrl.includes("aweme-images") || lowerUrl.includes("biz_tag=aweme_images");
 }

@@ -1,0 +1,98 @@
+[
+  {
+    "caseName": "合格-成年真人街拍戴棒球帽",
+    "inputDescription": "成年女性或男性真人出镜，帽子戴在头上，帽檐和帽身清楚可见，画面是穿搭、街拍、出片或日常种草。",
+    "expectedVerdict": {
+      "person_wearing_hat": true,
+      "hat_clear_and_main": true,
+      "obvious_noise": false,
+      "hat_type": "棒球帽/鸭舌帽",
+      "score": 88,
+      "reason": "真人戴帽且帽子清晰，是画面主要穿搭元素。"
+    }
+  },
+  {
+    "caseName": "合格-真人近景戴渔夫帽",
+    "inputDescription": "真人半身或头像近景，渔夫帽、贝雷帽、草帽等款式能明确看清，帽子占画面较明显比例。",
+    "expectedVerdict": {
+      "person_wearing_hat": true,
+      "hat_clear_and_main": true,
+      "obvious_noise": false,
+      "hat_type": "渔夫帽/贝雷帽/草帽",
+      "score": 85,
+      "reason": "真人佩戴帽子且款式清楚，符合穿搭种草。"
+    }
+  },
+  {
+    "caseName": "疑似-真人戴帽但帽子偏小",
+    "inputDescription": "真人全身照或多人照里有人戴帽，但帽子较小、距离远、被遮挡或只在少数图片中较清楚。",
+    "expectedVerdict": {
+      "person_wearing_hat": true,
+      "hat_clear_and_main": false,
+      "obvious_noise": false,
+      "hat_type": "不确定",
+      "score": 58,
+      "reason": "有人戴帽但帽子不是强主体，清晰度和占比偏弱。"
+    }
+  },
+  {
+    "caseName": "不合格-纯商品图",
+    "inputDescription": "只有帽子平铺、挂拍、白底商品图、详情页卖点图，画面没有真人佩戴。",
+    "expectedVerdict": {
+      "person_wearing_hat": false,
+      "hat_clear_and_main": true,
+      "obvious_noise": true,
+      "hat_type": "不确定",
+      "score": 35,
+      "reason": "帽子清楚但没有真人佩戴，属于纯商品图噪声。"
+    }
+  },
+  {
+    "caseName": "不合格-货架柜台",
+    "inputDescription": "画面主要是商场货架、柜台、摊位或一堆帽子陈列，没有明确真人穿搭出镜。",
+    "expectedVerdict": {
+      "person_wearing_hat": false,
+      "hat_clear_and_main": false,
+      "obvious_noise": true,
+      "hat_type": "不确定",
+      "score": 20,
+      "reason": "货架陈列不是真人穿搭内容。"
+    }
+  },
+  {
+    "caseName": "不合格-手工设计图",
+    "inputDescription": "钩织教程、手工制作过程、绘画设计图、版型图、材料包展示，帽子不是成人真人佩戴出片。",
+    "expectedVerdict": {
+      "person_wearing_hat": false,
+      "hat_clear_and_main": false,
+      "obvious_noise": true,
+      "hat_type": "不确定",
+      "score": 18,
+      "reason": "手工或设计内容不属于真人戴帽种草。"
+    }
+  },
+  {
+    "caseName": "不合格-儿童宝宝为主",
+    "inputDescription": "宝宝、儿童或亲子场景是画面主体，即使孩子戴帽也不是成人穿搭种草内容。",
+    "expectedVerdict": {
+      "person_wearing_hat": true,
+      "hat_clear_and_main": true,
+      "obvious_noise": true,
+      "hat_type": "其他",
+      "score": 25,
+      "reason": "儿童或宝宝为主，不符合成人真人穿搭筛选目标。"
+    }
+  },
+  {
+    "caseName": "不合格-帽子不清楚或非帽类",
+    "inputDescription": "画面里帽子极小、模糊、只露出边角，或主要是防晒面罩、头盔、发饰、空顶防晒工具。",
+    "expectedVerdict": {
+      "person_wearing_hat": false,
+      "hat_clear_and_main": false,
+      "obvious_noise": true,
+      "hat_type": "不确定",
+      "score": 15,
+      "reason": "帽子不可清晰判断或不是目标帽类。"
+    }
+  }
+]

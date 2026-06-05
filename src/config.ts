@@ -1,9 +1,9 @@
 import path from "node:path";
 import process from "node:process";
 import dotenv from "dotenv";
-import type { Platform } from "./types.js";
+import type { ContentType, Platform } from "./types.js";
 
-dotenv.config();
+dotenv.config({ override: true });
 
 export interface AppConfig {
   platform: Platform;
@@ -14,7 +14,30 @@ export interface AppConfig {
   maxScrolls: number;
   captureTimeoutMs: number;
   maxAgeDays: number;
+  contentType: ContentType;
+  enrichDouyinDetailImages: boolean;
+  enrichXhsDetailImages: boolean;
+  detailMaxItems: number;
+  detailImageLimit: number;
+  detailMinDelayMs: number;
+  detailMaxDelayMs: number;
   relevanceKeywords: string[];
+  xhsVisualFilter: boolean;
+  xhsVisualMaxImages: number;
+  xhsVisualConcurrency: number;
+  xhsVisualMaxItems: number;
+  xhsVisualTimeoutMs: number;
+  xhsVisualFewShot: boolean;
+  xhsVisualFewShotPath: string;
+  xhsVisualRulesPath: string;
+  xhsVisualReferenceImages: boolean;
+  xhsVisualReferenceGoodDir: string;
+  xhsVisualReferenceBadDir: string;
+  xhsVisualReferenceBorderlineDir: string;
+  xhsVisualReferenceMaxImagesPerClass: number;
+  dashscopeApiKey: string;
+  dashscopeBaseUrl: string;
+  dashscopeModel: string;
   userAgent: string;
   browserChannel: string;
   humanLike: boolean;
@@ -43,7 +66,39 @@ export function loadConfig(options: LoadConfigOptions = {}): AppConfig {
     maxScrolls: parsePositiveInt(process.env.MAX_SCROLLS, 8),
     captureTimeoutMs: parsePositiveInt(process.env.CAPTURE_TIMEOUT_MS, 30_000),
     maxAgeDays: parseNonNegativeInt(process.env.MAX_AGE_DAYS, 7),
+    contentType: parseContentType(readCliValue("--content-type") || process.env.CONTENT_TYPE, "image"),
+    enrichDouyinDetailImages: parseBoolean(readCliValue("--enrich-douyin-detail-images") || process.env.ENRICH_DOUYIN_DETAIL_IMAGES, true),
+    enrichXhsDetailImages: parseBoolean(readCliValue("--enrich-xhs-detail-images") || process.env.ENRICH_XHS_DETAIL_IMAGES, true),
+    detailMaxItems: parseNonNegativeInt(readCliValue("--detail-max-items") || process.env.DETAIL_MAX_ITEMS, 30),
+    detailImageLimit: parsePositiveInt(readCliValue("--detail-image-limit") || process.env.DETAIL_IMAGE_LIMIT, 6),
+    detailMinDelayMs: parseNonNegativeInt(readCliValue("--detail-min-delay-ms") || process.env.DETAIL_MIN_DELAY_MS, 5_000),
+    detailMaxDelayMs: parseNonNegativeInt(readCliValue("--detail-max-delay-ms") || process.env.DETAIL_MAX_DELAY_MS, 12_000),
     relevanceKeywords: parseRelevanceKeywords(process.env.RELEVANCE_KEYWORDS, keyword),
+    xhsVisualFilter: parseBoolean(readCliValue("--xhs-visual-filter") || process.env.XHS_VISUAL_FILTER, true),
+    xhsVisualMaxImages: parsePositiveInt(readCliValue("--xhs-visual-max-images") || process.env.XHS_VISUAL_MAX_IMAGES, 3),
+    xhsVisualConcurrency: parsePositiveInt(readCliValue("--xhs-visual-concurrency") || process.env.XHS_VISUAL_CONCURRENCY, 2),
+    xhsVisualMaxItems: parseNonNegativeInt(readCliValue("--xhs-visual-max-items") || process.env.XHS_VISUAL_MAX_ITEMS, 0),
+    xhsVisualTimeoutMs: parsePositiveInt(readCliValue("--xhs-visual-timeout-ms") || process.env.XHS_VISUAL_TIMEOUT_MS, 90_000),
+    xhsVisualFewShot: parseBoolean(readCliValue("--xhs-visual-fewshot") || process.env.XHS_VISUAL_FEWSHOT, true),
+    xhsVisualFewShotPath: resolveFromCwd(readCliValue("--xhs-visual-fewshot-path") || process.env.XHS_VISUAL_FEWSHOT_PATH || "prompts/xhs-visual-fewshot.json"),
+    xhsVisualRulesPath: resolveFromCwd(readCliValue("--xhs-visual-rules-path") || process.env.XHS_VISUAL_RULES_PATH || "references/xhs/visual_rules.md"),
+    xhsVisualReferenceImages: parseBoolean(readCliValue("--xhs-visual-reference-images") || process.env.XHS_VISUAL_REFERENCE_IMAGES, false),
+    xhsVisualReferenceGoodDir: resolveFromCwd(
+      readCliValue("--xhs-visual-reference-good-dir") || process.env.XHS_VISUAL_REFERENCE_GOOD_DIR || "references/xhs/good",
+    ),
+    xhsVisualReferenceBadDir: resolveFromCwd(
+      readCliValue("--xhs-visual-reference-bad-dir") || process.env.XHS_VISUAL_REFERENCE_BAD_DIR || "references/xhs/bad",
+    ),
+    xhsVisualReferenceBorderlineDir: resolveFromCwd(
+      readCliValue("--xhs-visual-reference-borderline-dir") || process.env.XHS_VISUAL_REFERENCE_BORDERLINE_DIR || "references/xhs/borderline",
+    ),
+    xhsVisualReferenceMaxImagesPerClass: parsePositiveInt(
+      readCliValue("--xhs-visual-reference-max-images-per-class") || process.env.XHS_VISUAL_REFERENCE_MAX_IMAGES_PER_CLASS,
+      7,
+    ),
+    dashscopeApiKey: process.env.DASHSCOPE_API_KEY?.trim() || "",
+    dashscopeBaseUrl: (process.env.DASHSCOPE_BASE_URL || "https://dashscope.aliyuncs.com/compatible-mode/v1").trim(),
+    dashscopeModel: (process.env.DASHSCOPE_MODEL || "qwen3-vl-flash").trim(),
     userAgent: process.env.USER_AGENT?.trim() || DEFAULT_USER_AGENT,
     browserChannel: process.env.BROWSER_CHANNEL ?? "chrome",
     humanLike: parseBoolean(process.env.HUMAN_LIKE, true),
@@ -88,6 +143,11 @@ function resolveUserDataDir(platform: RuntimePlatform, configured: string | unde
 function parsePlatform(value: string | undefined, fallback: Platform): Platform {
   const normalized = value?.trim().toLowerCase();
   return normalized === "xhs" || normalized === "douyin" || normalized === "all" ? normalized : fallback;
+}
+
+function parseContentType(value: string | undefined, fallback: ContentType): ContentType {
+  const normalized = value?.trim().toLowerCase();
+  return normalized === "image" || normalized === "video" ? normalized : fallback;
 }
 
 function parseBoolean(value: string | undefined, fallback: boolean): boolean {

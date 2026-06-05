@@ -47,7 +47,7 @@ async function main(): Promise<void> {
     console.log(`Keyword: ${config.keyword}`);
     await waitForXhsLogin(page, { humanLike: config.humanLike });
     await openXhsSearch(page, config.keyword);
-    await applyXhsSearchFilters(page);
+    await applyXhsSearchFilters(page, config.contentType);
 
     for (let index = 0; index < config.maxScrolls; index += 1) {
       await page.mouse.wheel(0, config.humanLike ? 1200 : 1800);

@@ -183,6 +183,7 @@ function objectToCandidate(value: unknown): RawNoteCandidate | null {
     xsecToken,
     xsecSource,
     coverUrl: pickCoverUrl(obj) || pickCoverUrl(noteCard),
+    imageUrls: pickBestImageUrls(obj, noteCard),
     raw: value,
   };
 }
@@ -279,4 +280,61 @@ function pickCoverUrl(object: Record<string, unknown> | undefined): string {
     pickString(cover, ["url", "trace_id"]) ||
     pickString(object, ["cover", "cover_url", "coverUrl", "url_default"])
   );
+}
+
+function pickImageUrls(object: Record<string, unknown> | undefined): string[] {
+  if (!object) return [];
+  const urls = new Set<string>();
+  collectImageUrls(object, "$", urls, 0);
+  return Array.from(urls);
+}
+
+function pickBestImageUrls(
+  object: Record<string, unknown>,
+  noteCard: Record<string, unknown> | undefined,
+): string[] {
+  const direct = pickImageUrls(object);
+  return direct.length > 0 ? direct : pickImageUrls(noteCard);
+}
+
+function collectImageUrls(value: unknown, path: string, output: Set<string>, depth: number): void {
+  if (depth > 8 || value === null || value === undefined) {
+    return;
+  }
+
+  if (typeof value === "string") {
+    if (looksLikeImageUrl(value, path)) {
+      output.add(value);
+    }
+    return;
+  }
+
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => collectImageUrls(item, `${path}.${index}`, output, depth + 1));
+    return;
+  }
+
+  if (typeof value !== "object") {
+    return;
+  }
+
+  for (const [key, child] of Object.entries(value as Record<string, unknown>)) {
+    collectImageUrls(child, `${path}.${key}`, output, depth + 1);
+  }
+}
+
+function looksLikeImageUrl(value: string, path: string): boolean {
+  const url = value.trim();
+  const lowerUrl = url.toLowerCase();
+  const lowerPath = path.toLowerCase();
+  if (!/^https?:\/\//i.test(url)) {
+    return false;
+  }
+  if (!["sns-webpic-qc.xhscdn.com", "sns-img", "xhscdn.com", "xiaohongshu.com"].some((host) => lowerUrl.includes(host))) {
+    return false;
+  }
+  if (["avatar", "user", "emoji", "sticker", "icon", "logo", "qrcode"].some((hint) => lowerPath.includes(hint) || lowerUrl.includes(`/${hint}`))) {
+    return false;
+  }
+  return /image|img|cover|url|url_list|trace|photo/i.test(path) || /\.(jpe?g|png|webp)(?:[?#]|$)/i.test(lowerUrl);
 }

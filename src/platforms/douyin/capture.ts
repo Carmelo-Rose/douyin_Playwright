@@ -1,19 +1,20 @@
 import type { Page } from "playwright";
 import { exportVideosToXlsx } from "../../exportXlsx.js";
 import { humanScroll, maybeReadingPause, randomBetween, sleep } from "../../human.js";
-import type { VideoRecord } from "../../types.js";
+import type { ContentType, VideoRecord } from "../../types.js";
 import type { AppConfig } from "../../config.js";
 import { openBrowserSession } from "../../browser.js";
 import { attachNetworkCapture, type NetworkCaptureHandle } from "./networkCapture.js";
 import { dedupeVideos } from "./normalize.js";
 import { waitForDouyinLogin } from "./login.js";
+import { enrichDouyinDetailImages } from "./detailImages.js";
 
 const JINGXUAN_HOME = "https://www.douyin.com/jingxuan";
 const ROOT_SEARCH_AID = "31f360ee-d884-44a8-ab0b-34086c05f4fa";
 
 export async function captureDouyin(config: AppConfig): Promise<void> {
   const { context, page } = await openBrowserSession(config);
-  const capture = attachNetworkCapture(page);
+  const capture = attachNetworkCapture(page, { contentType: config.contentType });
 
   try {
     console.log(`Platform: douyin`);
@@ -40,8 +41,9 @@ export async function captureDouyin(config: AppConfig): Promise<void> {
       return;
     }
 
-    const outputPath = await exportVideosToXlsx(videos, config.outputDir, config.keyword);
-    console.log(`Exported ${videos.length} videos to ${outputPath}`);
+    const enrichedVideos = await enrichDouyinDetailImages(page, videos, config);
+    const outputPath = await exportVideosToXlsx(enrichedVideos, config.outputDir, config.keyword, config.contentType);
+    console.log(`Exported ${enrichedVideos.length} videos to ${outputPath}`);
   } finally {
     await context.close();
   }
@@ -60,8 +62,9 @@ async function captureJingxuan(page: Page, capture: NetworkCaptureHandle, config
     return [];
   }
 
-  await applySearchFilters(page);
+  await applySearchFilters(page, config.contentType);
   await collectByScrolling(page, config);
+  await capture.flush();
   const videos = withSource(capture.getVideos(), "jingxuan");
   console.log(`Captured ${videos.length} raw videos from jingxuan. URL: ${page.url()}`);
   return videos;
@@ -72,8 +75,9 @@ async function captureRootSearch(page: Page, capture: NetworkCaptureHandle, conf
   console.log(`Opening 综合搜索: ${url}`);
   capture.reset();
   await page.goto(url, { waitUntil: "domcontentloaded", timeout: 60_000 });
-  await applySearchFilters(page);
+  await applySearchFilters(page, config.contentType);
   await collectByScrolling(page, config);
+  await capture.flush();
   const videos = withSource(capture.getVideos(), "root_search");
   console.log(`Captured ${videos.length} raw videos from root_search. URL: ${page.url()}`);
   return videos;
@@ -102,7 +106,7 @@ function buildRootSearchUrl(keyword: string): string {
   return `https://www.douyin.com/root/search/${encodeURIComponent(keyword)}?aid=${ROOT_SEARCH_AID}&type=general`;
 }
 
-async function applySearchFilters(page: Page): Promise<void> {
+async function applySearchFilters(page: Page, contentType: ContentType): Promise<void> {
   await page.waitForTimeout(1_500);
   await waitIfCaptcha(page);
 
@@ -116,12 +120,13 @@ async function applySearchFilters(page: Page): Promise<void> {
 
   const latest = await clickVisibleText(page, ["最新发布"], 2_000);
   const week = await clickVisibleText(page, ["一周内"], 2_000);
-  const video = await clickVisibleText(page, ["视频"], 2_000);
+  const contentLabel = contentType === "image" ? "图文" : "视频";
+  const content = await clickVisibleText(page, [contentLabel], 2_000);
 
-  if (!latest || !week || !video) {
-    console.warn(`Search filter partially applied: 最新发布=${latest}, 一周内=${week}, 视频=${video}.`);
+  if (!latest || !week || !content) {
+    console.warn(`Search filter partially applied: 最新发布=${latest}, 一周内=${week}, ${contentLabel}=${content}.`);
   } else {
-    console.log("Applied search filters: 最新发布 / 一周内 / 视频.");
+    console.log(`Applied search filters: 最新发布 / 一周内 / ${contentLabel}.`);
   }
 
   await page.waitForTimeout(2_000);
