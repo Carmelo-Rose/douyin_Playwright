@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "capture": "tsx src/index.ts",
+    "score:xhs-workbook": "tsx src/platforms/xhs/scoreWorkbook.ts",
     "probe:xhs": "tsx src/platforms/xhs/probe.ts",
     "probe:play-count": "tsx src/playCountProbe.ts",
     "probe:deep": "tsx src/playCountDeepProbe.ts",
