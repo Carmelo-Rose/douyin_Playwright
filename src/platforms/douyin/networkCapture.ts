@@ -56,6 +56,7 @@ const URL_BLACKLIST = [
 const DEBUG = process.env.DEBUG_CAPTURE === "true" || process.env.DEBUG_CAPTURE === "1";
 const DEBUG_DUMP_DIR = path.resolve(process.cwd(), "output");
 const DEBUG_DUMP_MAX = 15;
+const RESPONSE_READ_TIMEOUT_MS = 10_000;
 
 export interface NetworkCaptureHandle {
   getVideos: () => VideoRecord[];
@@ -115,9 +116,9 @@ export function attachNetworkCapture(page: Page, options: NetworkCaptureOptions 
   return {
     getVideos: () => videos,
     flush: async () => {
-      while (pendingResponses.size > 0) {
-        await Promise.allSettled(Array.from(pendingResponses));
-      }
+      // Wait for responses already in flight without being held open by
+      // background requests that the live search page starts afterward.
+      await Promise.allSettled(Array.from(pendingResponses));
     },
     reset: () => {
       videos.length = 0;
@@ -132,12 +133,21 @@ export function attachNetworkCapture(page: Page, options: NetworkCaptureOptions 
 async function readResponsePayloads(response: Response): Promise<unknown[]> {
   let text: string;
   try {
-    text = await response.text();
+    text = await withTimeout(response.text(), RESPONSE_READ_TIMEOUT_MS);
   } catch {
     return [];
   }
 
   return parseJsonPayloads(text);
+}
+
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => reject(new Error(`Timed out after ${timeoutMs}ms`)), timeoutMs);
+    promise
+      .then(resolve, reject)
+      .finally(() => clearTimeout(timeout));
+  });
 }
 
 function parseJsonPayloads(text: string): unknown[] {

@@ -1,211 +1,194 @@
 {
-  "samples": 1005,
-  "good": 266,
-  "bad": 739,
+  "samples_raw": 1924,
+  "samples_dedup": 1910,
+  "removed_near_duplicates": 14,
+  "good_raw": 404,
+  "bad_raw": 1520,
+  "good_dedup": 401,
+  "bad_dedup": 1509,
+  "n_note_groups": 1302,
   "feature_dim": 512,
-  "cv_acc": 0.894,
-  "cv_precision_good": 0.787,
-  "cv_recall_good": 0.82,
-  "cv_f1": 0.803,
+  "cv_random_leak_acc": 0.945,
+  "cv_groupkfold_acc": 0.944,
+  "cv_acc": 0.944,
+  "cv_precision_good": 0.852,
+  "cv_recall_good": 0.888,
+  "cv_f1": 0.869,
   "confusion": {
-    "TP": 218,
-    "TN": 680,
-    "FP": 59,
-    "FN": 48
+    "TP": 356,
+    "TN": 1447,
+    "FP": 62,
+    "FN": 45
   },
   "n_errors": 107,
   "errors": [
     {
-      "path": "ml\\data\\labeled\\good\\row010_我最常戴的帽子合集3_03.webp",
+      "path": "ml\\data\\labeled\\good\\700.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.363
+      "prob_good": 0.09
     },
     {
-      "path": "ml\\data\\labeled\\good\\row033_howto分享收藏已久帽子_01.webp",
+      "path": "ml\\data\\labeled\\good\\row02_帽子衣服我给到夯_27.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.005
+      "prob_good": 0.233
     },
     {
       "path": "ml\\data\\labeled\\good\\row033_howto分享收藏已久帽子_02.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.002
+      "prob_good": 0.123
     },
     {
-      "path": "ml\\data\\labeled\\good\\row042_帽子合集៸៸៸៸੭ﾞ_01.webp",
+      "path": "ml\\data\\labeled\\good\\row036_我最常带的帽子合集2_06.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.455
+      "prob_good": 0.474
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row041_img2.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.091
     },
     {
       "path": "ml\\data\\labeled\\good\\row042_帽子合集៸៸៸៸੭ﾞ_06.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.215
+      "prob_good": 0.092
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row051_img6.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.098
     },
     {
       "path": "ml\\data\\labeled\\good\\row053_和我的帽子们一起拍证件照_03.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.002
+      "prob_good": 0.448
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row061_img1.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.23
     },
     {
       "path": "ml\\data\\labeled\\good\\row066_tko帽子比衣服好看_03.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.126
+      "prob_good": 0.204
     },
     {
       "path": "ml\\data\\labeled\\good\\row06_扁头也终于体会到戴帽子好看的感觉了_01.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.249
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row06_扁头也终于体会到戴帽子好看的感觉了_02.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.436
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row073_喜欢我的小帽子_01.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.039
+      "prob_good": 0.006
     },
     {
       "path": "ml\\data\\labeled\\good\\row075_Jennie这物欲低得有点可怕了这帽子一_05.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.05
+      "prob_good": 0.014
     },
     {
-      "path": "ml\\data\\labeled\\good\\row075_Jennie这物欲低得有点可怕了这帽子一_06.webp",
+      "path": "ml\\data\\labeled\\good\\row096_img4.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.393
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row07_总结一些好看帽子_04.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.327
+      "prob_good": 0.297
     },
     {
       "path": "ml\\data\\labeled\\good\\row09_帽子_01.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.003
+      "prob_good": 0.006
     },
     {
-      "path": "ml\\data\\labeled\\good\\row111_61宠粉想把帽子送给心里住着小孩的你_03.webp",
+      "path": "ml\\data\\labeled\\good\\row121_img2.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.04
+      "prob_good": 0.137
     },
     {
-      "path": "ml\\data\\labeled\\good\\row126_早八人情侣党必入这顶帽子我锁死了_03.webp",
+      "path": "ml\\data\\labeled\\good\\row135_img1.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.205
+      "prob_good": 0.02
     },
     {
       "path": "ml\\data\\labeled\\good\\row13_巨显脸小显头小的渔夫帽修图我永远不发财_08.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.034
+      "prob_good": 0.067
     },
     {
-      "path": "ml\\data\\labeled\\good\\row149_小众帽子合集6就喜欢买点不一样的_06.webp",
+      "path": "ml\\data\\labeled\\good\\row150_神仙帽子合集防晒显瘦还能美出圈_01.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.114
+      "prob_good": 0.134
     },
     {
-      "path": "ml\\data\\labeled\\good\\row150_神仙帽子合集防晒显瘦还能美出圈_02.webp",
+      "path": "ml\\data\\labeled\\good\\row150_神仙帽子合集防晒显瘦还能美出圈_03.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.413
+      "prob_good": 0.061
     },
     {
-      "path": "ml\\data\\labeled\\good\\row153_Hollister这顶帽子怎么才被我发现_01.webp",
+      "path": "ml\\data\\labeled\\good\\row154_谁能拒绝一顶会卖萌的帽子呢_05.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.321
+      "prob_good": 0.303
     },
     {
       "path": "ml\\data\\labeled\\good\\row155_会在家里搭帽子墙的人日常都在戴什么帽子_05.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.034
+      "prob_good": 0.012
     },
     {
       "path": "ml\\data\\labeled\\good\\row156_摄影春夏帽子合集_06.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.009
+      "prob_good": 0.24
     },
     {
       "path": "ml\\data\\labeled\\good\\row158_30别戴土帽子了这顶才显气质_01.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.124
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row158_30别戴土帽子了这顶才显气质_02.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.304
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row158_30别戴土帽子了这顶才显气质_03.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.107
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row158_30别戴土帽子了这顶才显气质_04.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.112
+      "prob_good": 0.238
     },
     {
       "path": "ml\\data\\labeled\\good\\row15_藏蓝色棒球帽_22.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.166
+      "prob_good": 0.036
     },
     {
       "path": "ml\\data\\labeled\\good\\row167_谁懂这顶帽子的含金量_02.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.008
+      "prob_good": 0.091
     },
     {
-      "path": "ml\\data\\labeled\\good\\row177_at刚出预览逛了一圈看上了帽子燥候上新中_03.webp",
+      "path": "ml\\data\\labeled\\good\\row169_TX淮海这里是帽子天堂嘛_03.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.331
+      "prob_good": 0.366
     },
     {
-      "path": "ml\\data\\labeled\\good\\row178_素人get到了显白大头帽子的真香_02.webp",
+      "path": "ml\\data\\labeled\\good\\row171_𐂂ONEMOMENT全员美丽的一期帽子搭_01.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.141
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row17_拿到波点帽了人也美了_06.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.36
+      "prob_good": 0.321
     },
     {
       "path": "ml\\data\\labeled\\good\\row186_这组AI帽子图已经可以直接上链接了_04.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.27
+      "prob_good": 0.181
     },
     {
       "path": "ml\\data\\labeled\\good\\row186_这组AI帽子图已经可以直接上链接了_05.webp",
@@ -214,442 +197,466 @@
       "prob_good": 0.001
     },
     {
-      "path": "ml\\data\\labeled\\good\\row186_这组AI帽子图已经可以直接上链接了_06.webp",
+      "path": "ml\\data\\labeled\\good\\row187_img5.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.166
+      "prob_good": 0.072
     },
     {
       "path": "ml\\data\\labeled\\good\\row187_秋冬帽子大分享4大头大脸超友好_04.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.088
+      "prob_good": 0.02
     },
     {
       "path": "ml\\data\\labeled\\good\\row20_睡醒下楼迅速拿下同款帽子_03.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.0
+      "prob_good": 0.031
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row216_img1.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.091
     },
     {
       "path": "ml\\data\\labeled\\good\\row21_法拉利摩纳哥帽子到手附弯折帽檐教程_01.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.066
+      "prob_good": 0.02
     },
     {
-      "path": "ml\\data\\labeled\\good\\row22_把夏天的紫外线收到帽子里_03.webp",
+      "path": "ml\\data\\labeled\\good\\row225_img1.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.024
+      "prob_good": 0.469
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row225_img3.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.007
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row22_把夏天的紫外线收到帽子里_05.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.316
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row234_img2.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.403
     },
     {
       "path": "ml\\data\\labeled\\good\\row23_法式优雅千金感草帽_12.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.256
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row24_出门只能选一顶帽子的话我选它_05.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.005
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\企业微信截图_1780731728370.png",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.089
+      "prob_good": 0.061
     },
     {
       "path": "ml\\data\\labeled\\good\\企业微信截图_17807317679441.png",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.088
+      "prob_good": 0.078
     },
     {
       "path": "ml\\data\\labeled\\good\\企业微信截图_1780731802806.png",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.116
+      "prob_good": 0.007
     },
     {
       "path": "ml\\data\\labeled\\good\\企业微信截图_17807318119544.png",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.051
+      "prob_good": 0.114
     },
     {
       "path": "ml\\data\\labeled\\good\\企业微信截图_17807318328806.png",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.016
+      "prob_good": 0.308
     },
     {
-      "path": "ml\\data\\labeled\\good\\企业微信截图_1780731850656.png",
+      "path": "ml\\data\\labeled\\good\\企业微信截图_17807318804518.png",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.478
+      "prob_good": 0.276
     },
     {
-      "path": "ml\\data\\labeled\\good\\企业微信截图_17807325357524.png",
+      "path": "ml\\data\\labeled\\good\\企业微信截图_17807331498862.png",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.04
+      "prob_good": 0.321
     },
     {
-      "path": "ml\\data\\labeled\\good\\企业微信截图_17807325992801.png",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.455
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row020_帽子买来买去还是这几款好带_05.webp",
+      "path": "ml\\data\\labeled\\bad\\003.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.881
+      "prob_good": 0.998
     },
     {
-      "path": "ml\\data\\labeled\\bad\\row03_夏日citywalk刚需一款好帽子就够了_37.webp",
+      "path": "ml\\data\\labeled\\bad\\row019_img1.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.567
+      "prob_good": 0.914
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row025_img3.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.592
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row034_戴帽子才有的氛围感_05.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.601
     },
     {
       "path": "ml\\data\\labeled\\bad\\row03_夏日citywalk刚需一款好帽子就够了_38.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.88
+      "prob_good": 0.938
     },
     {
       "path": "ml\\data\\labeled\\bad\\row041_织女喜欢戴帽子_02.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.774
+      "prob_good": 0.551
     },
     {
       "path": "ml\\data\\labeled\\bad\\row045_韩系百搭的秋冬氛围感帽子来啦无广_06.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.723
+      "prob_good": 0.921
     },
     {
-      "path": "ml\\data\\labeled\\bad\\row053_和我的帽子们一起拍证件照_05.webp",
+      "path": "ml\\data\\labeled\\bad\\row04_帽子我的帽子_04.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.763
+      "prob_good": 0.544
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row050_img3.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.574
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row050_img4.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.839
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row051_img5.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.712
     },
     {
       "path": "ml\\data\\labeled\\bad\\row05_OOTD韩系紫帽子真的好韩_40.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.761
+      "prob_good": 0.839
     },
     {
-      "path": "ml\\data\\labeled\\bad\\row067_真发穿lo全靠帽子_05.webp",
+      "path": "ml\\data\\labeled\\bad\\row05_OOTD韩系紫帽子真的好韩_43.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.978
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row068_秋冬实用帽子合集大头友好版_02.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.556
+      "prob_good": 0.727
     },
     {
       "path": "ml\\data\\labeled\\bad\\row072_MLB硬顶帽子真的绝_02.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.667
+      "prob_good": 0.965
     },
     {
-      "path": "ml\\data\\labeled\\bad\\row079_喜欢除鸭舌帽以外的各类帽子_06.webp",
+      "path": "ml\\data\\labeled\\bad\\row075_img3.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.515
+      "prob_good": 0.962
     },
     {
-      "path": "ml\\data\\labeled\\bad\\row085_年度盘点大头围喜欢戴的帽子合集_02.webp",
+      "path": "ml\\data\\labeled\\bad\\row080_img3.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.784
+      "prob_good": 0.707
     },
     {
       "path": "ml\\data\\labeled\\bad\\row087_优化帽子_01.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.997
+      "prob_good": 0.999
     },
     {
       "path": "ml\\data\\labeled\\bad\\row090_怎么会有这么暖和的帽子和围巾附图解_03.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.984
+      "prob_good": 0.997
     },
     {
       "path": "ml\\data\\labeled\\bad\\row091_长中庭菱形脸秋冬帽子怎么选_06.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.887
+      "prob_good": 0.988
     },
     {
-      "path": "ml\\data\\labeled\\bad\\row111_61宠粉想把帽子送给心里住着小孩的你_05.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.99
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row111_61宠粉想把帽子送给心里住着小孩的你_06.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.818
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row120_Allin吧拉夫劳伦的帽子不做选择_05.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.565
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row12_久等了PonyUp帽子新色现已开售_21.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.997
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row12_久等了PonyUp帽子新色现已开售_30.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.99
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row12_久等了PonyUp帽子新色现已开售_46.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.541
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row133_帽子工厂高端品质定制_03.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.745
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row137_具有夏天防晒生命力的帽子_06.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.942
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row142_8bit的帽子实在是太酷了_03.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.927
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row145_clasico张晚意的帽子合集_04.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.789
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row146_关于我月入3500很会买秋冬通勤帽子分享_02.webp",
+      "path": "ml\\data\\labeled\\bad\\row097_img4.webp",
       "true": "bad",
       "pred": "good",
       "prob_good": 0.594
     },
     {
-      "path": "ml\\data\\labeled\\bad\\row148_春夏刚需这顶帽子我能焊在头上一整年_03.webp",
+      "path": "ml\\data\\labeled\\bad\\row120_Allin吧拉夫劳伦的帽子不做选择_05.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.662
+      "prob_good": 0.755
     },
     {
-      "path": "ml\\data\\labeled\\bad\\row148_春夏刚需这顶帽子我能焊在头上一整年_04.webp",
+      "path": "ml\\data\\labeled\\bad\\row122_img3.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.68
+      "prob_good": 0.763
     },
     {
-      "path": "ml\\data\\labeled\\bad\\row154_谁能拒绝一顶会卖萌的帽子呢_02.webp",
+      "path": "ml\\data\\labeled\\bad\\row125_img1.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.996
+      "prob_good": 0.797
     },
     {
-      "path": "ml\\data\\labeled\\bad\\row155_会在家里搭帽子墙的人日常都在戴什么帽子_02.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.945
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row155_会在家里搭帽子墙的人日常都在戴什么帽子_03.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.988
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row156_摄影春夏帽子合集_02.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.999
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row163_深圳有选帽困难症的朋友推荐来这里买帽子_03.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.868
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row165_戴上帽子一下子就高级了_02.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.801
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row16_宅女秋鱼同款帽子搭拉夫衬衫好适配谁懂_03.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.518
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row16_宅女秋鱼同款帽子搭拉夫衬衫好适配谁懂_37.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.666
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row16_宅女秋鱼同款帽子搭拉夫衬衫好适配谁懂_38.webp",
+      "path": "ml\\data\\labeled\\bad\\row125_焊在娃头上的半永久帽子这顶我能夸一夏天_04.webp",
       "true": "bad",
       "pred": "good",
       "prob_good": 0.943
     },
     {
-      "path": "ml\\data\\labeled\\bad\\row16_宅女秋鱼同款帽子搭拉夫衬衫好适配谁懂_39.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.514
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row172_一顶黄帽子拯救所有平淡穿搭_01.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.538
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row173_户外帽子大分享_04.webp",
+      "path": "ml\\data\\labeled\\bad\\row12_久等了PonyUp帽子新色现已开售_08.webp",
       "true": "bad",
       "pred": "good",
       "prob_good": 0.978
     },
     {
-      "path": "ml\\data\\labeled\\bad\\row175_简单但很好戴的一顶帽子JOJOKUR_04.webp",
+      "path": "ml\\data\\labeled\\bad\\row12_久等了PonyUp帽子新色现已开售_30.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.835
+      "prob_good": 0.933
     },
     {
-      "path": "ml\\data\\labeled\\bad\\row177_at刚出预览逛了一圈看上了帽子燥候上新中_01.webp",
+      "path": "ml\\data\\labeled\\bad\\row12_久等了PonyUp帽子新色现已开售_46.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.864
+      "prob_good": 0.939
     },
     {
-      "path": "ml\\data\\labeled\\bad\\row185_颜值与防晒并存的帽子_04.webp",
+      "path": "ml\\data\\labeled\\bad\\row130_img3.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.619
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row130_img5.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.604
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row142_8bit的帽子实在是太酷了_03.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.791
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row145_clasico张晚意的帽子合集_04.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.851
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row147_img2.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.974
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row148_春夏刚需这顶帽子我能焊在头上一整年_04.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.636
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row154_谁能拒绝一顶会卖萌的帽子呢_02.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.905
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row155_会在家里搭帽子墙的人日常都在戴什么帽子_02.webp",
       "true": "bad",
       "pred": "good",
       "prob_good": 0.981
     },
     {
-      "path": "ml\\data\\labeled\\bad\\row193_环球无牙仔帽子出租仅需20元园区门口取还_04.webp",
+      "path": "ml\\data\\labeled\\bad\\row156_摄影春夏帽子合集_02.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.8
+      "prob_good": 0.782
     },
     {
-      "path": "ml\\data\\labeled\\bad\\row30_今天通勤戴obsu交叉帽_31.webp",
+      "path": "ml\\data\\labeled\\bad\\row165_戴上帽子一下子就高级了_02.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.998
+      "prob_good": 0.992
     },
     {
-      "path": "ml\\data\\labeled\\bad\\row30_今天通勤戴obsu交叉帽_32.webp",
+      "path": "ml\\data\\labeled\\bad\\row16_宅女秋鱼同款帽子搭拉夫衬衫好适配谁懂_38.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.912
+      "prob_good": 0.992
     },
     {
-      "path": "ml\\data\\labeled\\bad\\row31_拉夫劳伦帽子试戴分享_06.webp",
+      "path": "ml\\data\\labeled\\bad\\row171_img3.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.74
+      "prob_good": 0.56
     },
     {
-      "path": "ml\\data\\labeled\\bad\\row33_好喜欢我的帽子出片和防晒我都要_21.webp",
+      "path": "ml\\data\\labeled\\bad\\row173_户外帽子大分享_04.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.587
+      "prob_good": 0.999
     },
     {
-      "path": "ml\\data\\labeled\\bad\\row35_我真的很有买帽子的天赋三之波点篇_21.webp",
+      "path": "ml\\data\\labeled\\bad\\row177_at刚出预览逛了一圈看上了帽子燥候上新中_01.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.991
+      "prob_good": 0.712
     },
     {
-      "path": "ml\\data\\labeled\\bad\\row36_美式帽子推荐_14.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.986
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row36_美式帽子推荐_16.webp",
+      "path": "ml\\data\\labeled\\bad\\row181_img1.webp",
       "true": "bad",
       "pred": "good",
       "prob_good": 0.99
     },
     {
-      "path": "ml\\data\\labeled\\bad\\row36_美式帽子推荐_17.webp",
+      "path": "ml\\data\\labeled\\bad\\row185_颜值与防晒并存的帽子_04.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.818
+      "prob_good": 0.898
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row187_img4.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.711
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row187_秋冬帽子大分享4大头大脸超友好_05.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.649
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row188_img4.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.524
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row189_img2.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.662
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row193_环球无牙仔帽子出租仅需20元园区门口取还_04.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.907
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row204_img2.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.828
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row210_img5.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.51
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row229_img1.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.792
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row235_img2.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.943
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row29_18顶夏日帽子分享_24.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.974
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row30_今天通勤戴obsu交叉帽_31.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.997
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row36_美式帽子推荐_14.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.989
     },
     {
       "path": "ml\\data\\labeled\\bad\\row39_inspo就喜欢这种松弛感_05.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.964
+      "prob_good": 0.896
     },
     {
       "path": "ml\\data\\labeled\\bad\\企业微信截图_17807316473375.png",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.831
+      "prob_good": 0.97
     },
     {
       "path": "ml\\data\\labeled\\bad\\企业微信截图_17807327237433.png",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.909
+      "prob_good": 0.975
     },
     {
       "path": "ml\\data\\labeled\\bad\\企业微信截图_17807328855549.png",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.978
+      "prob_good": 0.751
     },
     {
       "path": "ml\\data\\labeled\\bad\\企业微信截图_17807330086416.png",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.991
+      "prob_good": 0.995
     },
     {
       "path": "ml\\data\\labeled\\bad\\企业微信截图_17807330404349.png",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.998
+      "prob_good": 0.999
     },
     {
       "path": "ml\\data\\labeled\\bad\\企业微信截图_17807332716140.png",

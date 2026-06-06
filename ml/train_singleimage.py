@@ -47,16 +47,25 @@ DEDUP_COSINE = 0.95  # 同组内特征余弦 >= 此值视为近似重复图
 # 同一笔记 = 标题 + 博主 相同，仅中间序号不同。
 _NOTE_RE = re.compile(r"^(?P<title>.+?)_(?P<idx>\d+)_(?P<author>.+?)_来自小红书")
 
+# extract_images_only.py 输出格式：row{行号}_img{序号}.ext（合并后可能带 _fb{N} 后缀）
+# 同一行的多张图归为同一组
+_ROW_RE = re.compile(r"^row(?P<row>\d+)_img\d+")
+
 
 def note_group_key(path: Path) -> str:
-    """从文件名提取笔记分组键（标题+博主）。
+    """从文件名提取笔记分组键（标题+博主 或 行号）。
 
-    无法解析的文件名退化为自身 stem（视为独立组），保证不会误把
-    不相干的图归到一起。这样 StratifiedGroupKFold 至少不会比随机切分更差。
+    支持格式：
+    - 小红书网页版：{标题}_{序号}_{博主}_来自小红书*.jpg → 按标题+博主分组
+    - extract_images_only 输出：row{N}_img{N}*.webp      → 按行号分组
+    - 其他：退化为自身 stem（独立组）
     """
     m = _NOTE_RE.match(path.name)
     if m:
         return f"{m.group('title')}|{m.group('author')}"
+    m2 = _ROW_RE.match(path.name)
+    if m2:
+        return f"row{m2.group('row')}"
     return path.stem  # 退化：每张独立成组
 
 
@@ -153,9 +162,16 @@ def dedup_near_duplicates(X, y, paths, groups, cos_thr=DEDUP_COSINE):
 
 def cv_metrics(model_factory, X, y, cv_iter):
     """跑一次交叉验证，返回 (preds, probs, 指标 dict)。"""
-    preds = cross_val_predict(model_factory(), X, y, cv=cv_iter)
+    # cv_iter 可能是一次性生成器（StratifiedGroupKFold.split 返回的 generator），
+    # 先物化为列表，两次 cross_val_predict 都能用。
+    # 如果是 CV 对象（有 split 方法）则直接传，sklearn 会自行调用 split。
+    if hasattr(cv_iter, "split"):
+        splits = cv_iter  # CV 对象，sklearn 内部会多次调用 split
+    else:
+        splits = list(cv_iter)  # generator → 物化，可重复使用
+    preds = cross_val_predict(model_factory(), X, y, cv=splits)
     probs = cross_val_predict(
-        model_factory(), X, y, cv=cv_iter, method="predict_proba"
+        model_factory(), X, y, cv=splits, method="predict_proba"
     )[:, 1]
     tp = int(((preds == 1) & (y == 1)).sum())
     tn = int(((preds == 0) & (y == 0)).sum())
