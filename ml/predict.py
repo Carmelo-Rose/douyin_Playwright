@@ -24,6 +24,13 @@ import shutil
 import sys
 from pathlib import Path
 
+# 强制 stdout 用 UTF-8，避免 Windows GBK 控制台打印中文/emoji 报错
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+except Exception:
+    pass
+
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import joblib
@@ -84,7 +91,7 @@ def main():
     n_good = sum(1 for r in rows if r[1] == "good")
     print(f"\n=== 预测结果 (good={n_good}, bad={len(rows)-n_good}) ===")
     for name, verdict, prob, _ in rows:
-        mark = "✅" if verdict == "good" else "❌"
+        mark = "[GOOD]" if verdict == "good" else "[BAD] "
         print(f"{mark} P(good)={prob:.2f}  {name[:50]}")
 
     if args.csv:
