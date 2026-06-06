@@ -1,0 +1,8 @@
+# 模型权重缓存（开源权重，可重新下载，勿入库）
+cache/
+# 从 xlsx 提取的图片与中间产物（可由脚本重新生成）
+data/images/
+data/embeddings.npz
+# 保留 dataset.jsonl 和 validation_result.json 作为实验记录
+!data/dataset.jsonl
+!data/validation_result.json

@@ -1,0 +1,28 @@
+{
+  "samples": 38,
+  "pos": 21,
+  "neg": 17,
+  "loo_acc": 0.816,
+  "loo_precision_pos": 0.818,
+  "loo_recall_pos": 0.857,
+  "confusion": {
+    "TP": 18,
+    "TN": 13,
+    "FP": 4,
+    "FN": 3
+  },
+  "vlm_miss_total": 13,
+  "vlm_miss_saved": 10,
+  "saved_rows": [
+    3,
+    5,
+    8,
+    14,
+    16,
+    29,
+    32,
+    33,
+    35,
+    36
+  ]
+}
