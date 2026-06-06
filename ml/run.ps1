@@ -12,7 +12,7 @@ param(
     [ValidateSet("predict", "merge", "train", "extract")]
     [string]$Action,
 
-    [string]$Input,
+    [string]$InputPath,
     [string]$SortTo,
     [string]$From,
     [string]$Out = "ml\data\to_predict",
@@ -48,8 +48,8 @@ $env:PYTHONIOENCODING = "utf-8"
 
 switch ($Action) {
     "predict" {
-        if (-not $Input) { throw "predict 需要 -Input" }
-        $args = @("ml\predict.py", "--input", $Input, "--threshold", $Threshold)
+        if (-not $InputPath) { throw "predict 需要 -Input" }
+        $args = @("ml\predict.py", "--input", $InputPath, "--threshold", $Threshold)
         if ($SortTo) { $args += @("--sort-to", $SortTo) }
         if ($Csv)    { $args += @("--csv", $Csv) }
         & $py @args
@@ -62,8 +62,8 @@ switch ($Action) {
         & $py "ml\train_singleimage.py"
     }
     "extract" {
-        if (-not $Input) { throw "extract 需要 -Input" }
-        $args = @("ml\extract_images_only.py", "--input", $Input, "--out", $Out, "--imgs-per-note", $ImgsPerNote)
+        if (-not $InputPath) { throw "extract 需要 -Input" }
+        $args = @("ml\extract_images_only.py", "--input", $InputPath, "--out", $Out, "--imgs-per-note", $ImgsPerNote)
         if ($MaxNotes -gt 0) { $args += @("--max-notes", $MaxNotes) }
         & $py @args
     }
