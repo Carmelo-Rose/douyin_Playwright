@@ -1,0 +1,283 @@
+{
+  "samples": 245,
+  "good": 124,
+  "bad": 121,
+  "feature_dim": 512,
+  "cv_acc": 0.82,
+  "cv_precision_good": 0.812,
+  "cv_recall_good": 0.839,
+  "cv_f1": 0.825,
+  "confusion": {
+    "TP": 104,
+    "TN": 97,
+    "FP": 24,
+    "FN": 20
+  },
+  "n_errors": 44,
+  "errors": [
+    {
+      "path": "ml\\data\\labeled\\good\\row06_扁头也终于体会到戴帽子好看的感觉了_01.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.013
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row06_扁头也终于体会到戴帽子好看的感觉了_02.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.042
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row09_帽子_01.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.015
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row13_巨显脸小显头小的渔夫帽修图我永远不发财_08.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.273
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row17_拿到波点帽了人也美了_06.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.09
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row20_睡醒下楼迅速拿下同款帽子_03.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.037
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row22_把夏天的紫外线收到帽子里_03.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.021
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row23_法式优雅千金感草帽_12.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.252
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row38_跟着张翅买帽子_17.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.051
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\企业微信截图_17807316941755.png",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.18
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\企业微信截图_17807317071446.png",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.194
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\企业微信截图_17807317183730.png",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.087
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\企业微信截图_1780731802806.png",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.095
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\企业微信截图_17807325357524.png",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.016
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\企业微信截图_17807325746921.png",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.145
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\企业微信截图_17807326858205.png",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.106
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\企业微信截图_17807328231860.png",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.105
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\企业微信截图_17807329716148.png",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.005
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\企业微信截图_17807330512600.png",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.472
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\企业微信截图_17807331805265.png",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.191
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row05_OOTD韩系紫帽子真的好韩_40.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.957
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row12_久等了PonyUp帽子新色现已开售_21.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.902
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row12_久等了PonyUp帽子新色现已开售_46.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.999
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row25_宝宝帽子夏季薄款男童外出洋气防晒帽遮阳帽_15.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 1.0
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row27_条纹防晒帽_03.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.765
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row29_18顶夏日帽子分享_24.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.659
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row30_今天通勤戴obsu交叉帽_31.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.96
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row31_拉夫劳伦帽子试戴分享_06.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.632
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row33_好喜欢我的帽子出片和防晒我都要_21.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.93
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row35_我真的很有买帽子的天赋三之波点篇_21.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.597
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row36_美式帽子推荐_14.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.976
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row36_美式帽子推荐_16.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.727
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\企业微信截图_17807313289724.png",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.915
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\企业微信截图_17807316473375.png",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 1.0
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\企业微信截图_17807323615780.png",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.767
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\企业微信截图_17807327237433.png",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.772
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\企业微信截图_17807327775463.png",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.973
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\企业微信截图_17807328401560.png",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.819
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\企业微信截图_17807329129565.png",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.763
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\企业微信截图_17807330086416.png",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.548
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\企业微信截图_17807330622676.png",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.986
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\企业微信截图_17807330714875.png",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.574
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\企业微信截图_17807332003569.png",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.814
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\企业微信截图_17807332716140.png",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.932
+    }
+  ]
+}
