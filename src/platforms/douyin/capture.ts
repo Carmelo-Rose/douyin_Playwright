@@ -1,7 +1,7 @@
 import type { Page } from "playwright";
 import { exportVideosToXlsx } from "../../exportXlsx.js";
 import { humanScroll, maybeReadingPause, randomBetween, sleep } from "../../human.js";
-import type { ContentType, VideoRecord } from "../../types.js";
+import type { ContentType, PublishTimeFilter, VideoRecord } from "../../types.js";
 import type { AppConfig } from "../../config.js";
 import { openBrowserSession } from "../../browser.js";
 import { attachNetworkCapture, type NetworkCaptureHandle } from "./networkCapture.js";
@@ -62,7 +62,7 @@ async function captureJingxuan(page: Page, capture: NetworkCaptureHandle, config
     return [];
   }
 
-  await applySearchFilters(page, config.contentType);
+  await applySearchFilters(page, config.contentType, config.publishTime);
   await collectByScrolling(page, config);
   await capture.flush();
   const videos = withSource(capture.getVideos(), "jingxuan");
@@ -75,7 +75,7 @@ async function captureRootSearch(page: Page, capture: NetworkCaptureHandle, conf
   console.log(`Opening 综合搜索: ${url}`);
   capture.reset();
   await page.goto(url, { waitUntil: "domcontentloaded", timeout: 60_000 });
-  await applySearchFilters(page, config.contentType);
+  await applySearchFilters(page, config.contentType, config.publishTime);
   await collectByScrolling(page, config);
   await capture.flush();
   const videos = withSource(capture.getVideos(), "root_search");
@@ -106,7 +106,7 @@ function buildRootSearchUrl(keyword: string): string {
   return `https://www.douyin.com/root/search/${encodeURIComponent(keyword)}?aid=${ROOT_SEARCH_AID}&type=general`;
 }
 
-async function applySearchFilters(page: Page, contentType: ContentType): Promise<void> {
+async function applySearchFilters(page: Page, contentType: ContentType, publishTime: PublishTimeFilter): Promise<void> {
   await page.waitForTimeout(1_500);
   await waitIfCaptcha(page);
 
@@ -119,18 +119,26 @@ async function applySearchFilters(page: Page, contentType: ContentType): Promise
   await page.waitForTimeout(1_000);
 
   const latest = await clickVisibleText(page, ["最新发布"], 2_000);
-  const week = await clickVisibleText(page, ["一周内"], 2_000);
+  const publishTimeLabel = resolvePublishTimeLabel(publishTime);
+  const time = await clickVisibleText(page, [publishTimeLabel], 2_000);
   const contentLabel = contentType === "image" ? "图文" : "视频";
   const content = await clickVisibleText(page, [contentLabel], 2_000);
 
-  if (!latest || !week || !content) {
-    console.warn(`Search filter partially applied: 最新发布=${latest}, 一周内=${week}, ${contentLabel}=${content}.`);
+  if (!latest || !time || !content) {
+    console.warn(`Search filter partially applied: 最新发布=${latest}, ${publishTimeLabel}=${time}, ${contentLabel}=${content}.`);
   } else {
-    console.log(`Applied search filters: 最新发布 / 一周内 / ${contentLabel}.`);
+    console.log(`Applied search filters: 最新发布 / ${publishTimeLabel} / ${contentLabel}.`);
   }
 
   await page.waitForTimeout(2_000);
   await waitIfCaptcha(page);
+}
+
+function resolvePublishTimeLabel(publishTime: PublishTimeFilter): string {
+  if (publishTime === "day") return "一天内";
+  if (publishTime === "half-year") return "半年内";
+  if (publishTime === "unlimited") return "不限";
+  return "一周内";
 }
 
 async function hoverVisibleText(page: Page, texts: string[], timeoutMs: number): Promise<boolean> {

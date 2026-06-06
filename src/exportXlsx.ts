@@ -14,6 +14,7 @@ const THUMBNAIL_COLUMN_WIDTH = 18;
 const THUMBNAIL_ROW_HEIGHT = 82;
 const THUMBNAIL_SIZE = 88;
 const IMAGE_DOWNLOAD_TIMEOUT_MS = 12_000;
+const IMAGE_DOWNLOAD_CONCURRENCY = 4;
 const VIDEO_EMBEDDED_IMAGE_COUNT = 6;
 const NOTE_EMBEDDED_IMAGE_COUNT = 6;
 
@@ -164,6 +165,29 @@ async function embedImageGrid(
   firstImageColumnNumber: number,
 ): Promise<void> {
   const imageCache = new Map<string, Promise<WorkbookImage | null>>();
+  const uniqueUrls = normalizeImageUrlList(imageRows.flat());
+  let cursor = 0;
+  let completed = 0;
+
+  if (uniqueUrls.length > 0) {
+    console.log(`[xlsx:images] downloading ${uniqueUrls.length} image(s), concurrency=${IMAGE_DOWNLOAD_CONCURRENCY}...`);
+    const workers = Array.from(
+      { length: Math.min(IMAGE_DOWNLOAD_CONCURRENCY, uniqueUrls.length) },
+      async () => {
+        while (cursor < uniqueUrls.length) {
+          const url = uniqueUrls[cursor];
+          cursor += 1;
+          const image = await downloadImage(url);
+          imageCache.set(url, Promise.resolve(image));
+          completed += 1;
+          if (completed % 10 === 0 || completed === uniqueUrls.length) {
+            console.log(`[xlsx:images] downloaded ${completed}/${uniqueUrls.length}.`);
+          }
+        }
+      },
+    );
+    await Promise.all(workers);
+  }
 
   for (let index = 0; index < imageRows.length; index += 1) {
     const rowNumber = index + 2;

@@ -1,9 +1,9 @@
 import path from "node:path";
 import process from "node:process";
 import dotenv from "dotenv";
-import type { ContentType, Platform } from "./types.js";
+import type { ContentType, Platform, PublishTimeFilter, SearchSort } from "./types.js";
 
-dotenv.config({ override: true });
+dotenv.config();
 
 export interface AppConfig {
   platform: Platform;
@@ -15,6 +15,8 @@ export interface AppConfig {
   captureTimeoutMs: number;
   maxAgeDays: number;
   contentType: ContentType;
+  publishTime: PublishTimeFilter;
+  sortBy: SearchSort;
   enrichDouyinDetailImages: boolean;
   enrichXhsDetailImages: boolean;
   detailMaxItems: number;
@@ -65,8 +67,10 @@ export function loadConfig(options: LoadConfigOptions = {}): AppConfig {
     headless: parseBoolean(process.env.HEADLESS, false),
     maxScrolls: parsePositiveInt(process.env.MAX_SCROLLS, 8),
     captureTimeoutMs: parsePositiveInt(process.env.CAPTURE_TIMEOUT_MS, 30_000),
-    maxAgeDays: parseNonNegativeInt(process.env.MAX_AGE_DAYS, 7),
+    maxAgeDays: parseNonNegativeInt(readCliValue("--max-age-days") || process.env.MAX_AGE_DAYS, 7),
     contentType: parseContentType(readCliValue("--content-type") || process.env.CONTENT_TYPE, "image"),
+    publishTime: parsePublishTime(readCliValue("--publish-time") || process.env.PUBLISH_TIME, "week"),
+    sortBy: parseSearchSort(readCliValue("--sort-by") || process.env.SORT_BY, "latest"),
     enrichDouyinDetailImages: parseBoolean(readCliValue("--enrich-douyin-detail-images") || process.env.ENRICH_DOUYIN_DETAIL_IMAGES, true),
     enrichXhsDetailImages: parseBoolean(readCliValue("--enrich-xhs-detail-images") || process.env.ENRICH_XHS_DETAIL_IMAGES, true),
     detailMaxItems: parseNonNegativeInt(readCliValue("--detail-max-items") || process.env.DETAIL_MAX_ITEMS, 30),
@@ -148,6 +152,18 @@ function parsePlatform(value: string | undefined, fallback: Platform): Platform 
 function parseContentType(value: string | undefined, fallback: ContentType): ContentType {
   const normalized = value?.trim().toLowerCase();
   return normalized === "image" || normalized === "video" ? normalized : fallback;
+}
+
+function parsePublishTime(value: string | undefined, fallback: PublishTimeFilter): PublishTimeFilter {
+  const normalized = value?.trim().toLowerCase();
+  return normalized === "day" || normalized === "week" || normalized === "half-year" || normalized === "unlimited"
+    ? normalized
+    : fallback;
+}
+
+function parseSearchSort(value: string | undefined, fallback: SearchSort): SearchSort {
+  const normalized = value?.trim().toLowerCase();
+  return normalized === "latest" || normalized === "comprehensive" ? normalized : fallback;
 }
 
 function parseBoolean(value: string | undefined, fallback: boolean): boolean {

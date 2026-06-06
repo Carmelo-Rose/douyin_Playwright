@@ -3,7 +3,7 @@ import { openBrowserSession } from "../../browser.js";
 import type { AppConfig } from "../../config.js";
 import { exportNotesToXlsx } from "../../exportXlsx.js";
 import { humanScroll, maybeReadingPause, randomBetween, sleep } from "../../human.js";
-import type { ContentType, NoteRecord } from "../../types.js";
+import type { ContentType, NoteRecord, PublishTimeFilter, SearchSort } from "../../types.js";
 import { waitForXhsLogin } from "./login.js";
 import { attachXhsNetworkCapture, type XhsNetworkCaptureHandle } from "./networkCapture.js";
 import { dedupeNotes, formatCreateTimeFromNoteId, resolveXhsDisplayDateStable } from "./normalize.js";
@@ -14,10 +14,14 @@ const XHS_SEARCH_URL = "https://www.xiaohongshu.com/search_result";
 const XHS_TEXT = {
   filter: "\u7b5b\u9009",
   filtered: "\u5df2\u7b5b\u9009",
+  comprehensive: "\u7efc\u5408",
   latest: "\u6700\u65b0",
   video: "\u89c6\u9891",
   image: "\u56fe\u6587",
+  day: "\u4e00\u5929\u5185",
   week: "\u4e00\u5468\u5185",
+  halfYear: "\u534a\u5e74\u5185",
+  unlimited: "\u4e0d\u9650",
   collapse: "\u6536\u8d77",
 };
 const XHS_PANEL_TEXT = {
@@ -74,7 +78,7 @@ export async function captureXhs(config: AppConfig): Promise<void> {
 async function captureXhsSearch(page: Page, capture: XhsNetworkCaptureHandle, config: AppConfig): Promise<NoteRecord[]> {
   capture.reset();
   await openXhsSearch(page, config.keyword);
-  await applyXhsSearchFiltersStable(page, config.contentType);
+  await applyXhsSearchFiltersStable(page, config.contentType, config.publishTime, config.sortBy);
   await collectByScrolling(page, config);
   const networkNotes = capture.getNotes().map((note) => ({ ...note, source: "xhs_search" }));
   // DOM 笔记的 createTime 此时是"原始日期文案"（如 "04-03" / "553天前" / ""）。
@@ -89,7 +93,12 @@ async function captureXhsSearch(page: Page, capture: XhsNetworkCaptureHandle, co
   return notes;
 }
 
-async function applyXhsSearchFiltersStable(page: Page, contentType: ContentType): Promise<void> {
+async function applyXhsSearchFiltersStable(
+  page: Page,
+  contentType: ContentType,
+  publishTime: PublishTimeFilter,
+  sortBy: SearchSort,
+): Promise<void> {
   await page.waitForTimeout(1_500);
   await waitIfCaptcha(page);
 
@@ -113,16 +122,18 @@ async function applyXhsSearchFiltersStable(page: Page, contentType: ContentType)
     await openXhsFilterPanel(page);
   }
 
-  const latest = await clickXhsPanelOption(page, XHS_PANEL_TEXT.sortBy, XHS_TEXT.latest);
+  const sortLabel = sortBy === "comprehensive" ? XHS_TEXT.comprehensive : XHS_TEXT.latest;
+  const sort = await clickXhsPanelOption(page, XHS_PANEL_TEXT.sortBy, sortLabel);
   const contentLabel = contentType === "image" ? XHS_TEXT.image : XHS_TEXT.video;
   const content = await clickXhsPanelOption(page, XHS_PANEL_TEXT.noteType, contentLabel);
-  const week = await clickXhsPanelOption(page, XHS_PANEL_TEXT.publishTime, XHS_TEXT.week);
+  const publishTimeLabel = resolveXhsPublishTimeLabel(publishTime);
+  const time = await clickXhsPanelOption(page, XHS_PANEL_TEXT.publishTime, publishTimeLabel);
 
-  if (!latest || !content || !week) {
-    console.warn(`Xiaohongshu filters partially applied: latest=${latest}, ${contentType}=${content}, week=${week}.`);
+  if (!sort || !content || !time) {
+    console.warn(`Xiaohongshu filters partially applied: ${sortBy}=${sort}, ${contentType}=${content}, ${publishTime}=${time}.`);
     await logVisibleFilterCandidates(page);
   } else {
-    console.log(`Applied Xiaohongshu filters: latest / ${contentType} / one week.`);
+    console.log(`Applied Xiaohongshu filters: ${sortBy} / ${contentType} / ${publishTime}.`);
   }
 
   const closed = await clickVisibleText(page, [XHS_TEXT.collapse], 1_500);
@@ -467,8 +478,20 @@ async function submitXhsSearchInput(page: Page, input: Locator, keyword: string)
   return false;
 }
 
-export async function applyXhsSearchFilters(page: Page, contentType: ContentType = "image"): Promise<void> {
-  await applyXhsSearchFiltersStable(page, contentType);
+export async function applyXhsSearchFilters(
+  page: Page,
+  contentType: ContentType = "image",
+  publishTime: PublishTimeFilter = "week",
+  sortBy: SearchSort = "latest",
+): Promise<void> {
+  await applyXhsSearchFiltersStable(page, contentType, publishTime, sortBy);
+}
+
+function resolveXhsPublishTimeLabel(publishTime: PublishTimeFilter): string {
+  if (publishTime === "day") return XHS_TEXT.day;
+  if (publishTime === "half-year") return XHS_TEXT.halfYear;
+  if (publishTime === "unlimited") return XHS_TEXT.unlimited;
+  return XHS_TEXT.week;
 }
 
 async function collectByScrolling(page: Page, config: AppConfig): Promise<void> {

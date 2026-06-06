@@ -16,6 +16,8 @@ cp .env.example .env
 - `HEADLESS=false`：首次运行保持 false 以便手动登录
 - `MAX_SCROLLS`、`CAPTURE_TIMEOUT_MS`：滚动次数 / 最后等待时长
 - `CONTENT_TYPE=image`：内容形式，默认抓“图文”；需要切回视频可设为 `video`，也可用 `--content-type video` 临时覆盖
+- `PUBLISH_TIME=week`：页面发布时间筛选，支持 `day` / `week` / `half-year` / `unlimited`
+- `SORT_BY=latest`：小红书排序，支持 `latest` / `comprehensive`
 - `ENRICH_DOUYIN_DETAIL_IMAGES=true` / `ENRICH_XHS_DETAIL_IMAGES=true`：图文会逐条打开详情页补抓多张图片；默认最多处理 30 条、每条最多 6 张、每条之间随机等待 5-12 秒，遇到验证码会停止补图并保留封面
 - `MAX_AGE_DAYS=7`：只导出最近 7 天发布的内容；设为 `0` 可关闭发布时间过滤
 - `RELEVANCE_KEYWORDS`：相关性过滤词，多个词用英文逗号分隔；留空时会根据 `KEYWORD` 自动生成基础关键词
@@ -54,6 +56,18 @@ npm run capture -- --keyword 帽子 --content-type video
 
 ```bash
 npm run capture -- --platform douyin --keyword 帽子 --detail-max-items 20 --detail-image-limit 6 --detail-min-delay-ms 5000 --detail-max-delay-ms 12000
+```
+
+抓取页面筛选为“半年内”，并在导出前保留最近 180 天：
+
+```bash
+npm run capture -- --platform douyin --keyword 帽子 --publish-time half-year --max-age-days 180
+```
+
+小红书仅使用“帽子关键词 + 图文”，综合排序且不限发布时间：
+
+```bash
+npm run capture -- --platform xhs --keyword 帽子 --sort-by comprehensive --content-type image --publish-time unlimited --max-age-days 0 --xhs-visual-filter false
 ```
 
 **首次运行**会停在抖音首页等你手动扫码登录，登录成功后脚本自动继续。登录态保存在 `.user-data/douyin`，后续运行直接跳过登录。
@@ -182,7 +196,7 @@ npm run build
 - 主入口 `src/index.ts` 只负责按 `PLATFORM` / `--platform` 分发；平台差异放在 `src/platforms/douyin/` 和 `src/platforms/xhs/`。
 - 抓取路径 1：goto `https://www.douyin.com/jingxuan` → 找搜索框输入关键词 → 回车 → 等 SPA 路由到 `/jingxuan/search/<keyword>` → 滚动收集 XHR。
 - 抓取路径 2：goto `https://www.douyin.com/root/search/<keyword>?aid=31f360ee-d884-44a8-ab0b-34086c05f4fa&type=general` → 滚动收集 XHR。
-- 滚动前会尝试点页面筛选：`最新发布` / `一周内` / `图文`（默认）；如果设置 `CONTENT_TYPE=video` 或 `--content-type video`，则改点 `视频`。如果页面筛选控件变了，会继续抓取并依赖 `MAX_AGE_DAYS` 兜底。
+- 滚动前会尝试点页面筛选：`最新发布` / 发布时间 / 内容形式。发布时间可用 `--publish-time day|week|half-year|unlimited` 控制，内容形式可用 `--content-type image|video` 控制。如果页面筛选控件变了，会继续抓取并依赖 `MAX_AGE_DAYS` 兜底。
 - 接口：`https://www.douyin.com/aweme/v1/web/general/search/single/`（精选搜索）。
 - 视频候选识别：响应里寻找带 `aweme_id` + `desc` + (`statistics` 或 `author`) 的对象。子卡片（嵌套在主结果里的关联视频）因为缺 `desc` 会被丢掉，只保留字段完整的主卡视频。
 - 两个来源最终按 `aweme_id` 合并去重；同一个视频被两个入口抓到时，`来源` 会合并为 `jingxuan,root_search`。

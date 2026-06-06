@@ -1,5 +1,7 @@
 export type Platform = "douyin" | "xhs" | "all";
 export type ContentType = "image" | "video";
+export type PublishTimeFilter = "day" | "week" | "half-year" | "unlimited";
+export type SearchSort = "latest" | "comprehensive";
 
 export interface VideoRecord {
   awemeId: string;
