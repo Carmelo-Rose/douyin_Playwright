@@ -53,7 +53,7 @@ def parse_drawing_anchors(zf: zipfile.ZipFile):
         rid_to_media[rid] = media
 
     anchors = {}
-    for block in re.findall(r"<xdr:oneCellAnchor>[\s\S]*?</xdr:oneCellAnchor>", xml):
+    for block in re.findall(r"<xdr:oneCellAnchor[^>]*>[\s\S]*?</xdr:oneCellAnchor>", xml):
         row = re.search(r"<xdr:row>(\d+)</xdr:row>", block)
         col = re.search(r"<xdr:col>(\d+)</xdr:col>", block)
         rid = re.search(r'r:embed="(rId\d+)"', block)

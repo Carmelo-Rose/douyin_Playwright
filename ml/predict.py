@@ -20,6 +20,7 @@
 """
 import argparse
 import csv
+import shutil
 import sys
 from pathlib import Path
 
@@ -45,6 +46,7 @@ def main():
     ap.add_argument("--input", required=True, help="图片文件或文件夹")
     ap.add_argument("--threshold", type=float, default=0.5, help="判 good 的概率阈值，默认0.5")
     ap.add_argument("--csv", default="", help="可选：导出结果到 csv")
+    ap.add_argument("--sort-to", default="", help="可选：把图按判断结果复制到 <目录>/good 和 <目录>/bad")
     args = ap.parse_args()
 
     if not MODEL_PATH.exists():
@@ -93,6 +95,29 @@ def main():
             for name, verdict, prob, full in rows:
                 w.writerow([name, verdict, f"{prob:.4f}", full])
         print(f"\n[done] 已导出 -> {csv_path}")
+
+    if args.sort_to:
+        sort_dir = Path(args.sort_to)
+        if not sort_dir.is_absolute():
+            sort_dir = Path.cwd() / sort_dir
+        good_dir = sort_dir / "good"
+        bad_dir = sort_dir / "bad"
+        good_dir.mkdir(parents=True, exist_ok=True)
+        bad_dir.mkdir(parents=True, exist_ok=True)
+        copied = 0
+        for name, verdict, prob, full in rows:
+            dest_dir = good_dir if verdict == "good" else bad_dir
+            # 文件名加置信度前缀，便于在文件夹里按"最像/最不像"排序查看
+            pct = int(round(prob * 100))
+            dest_name = f"{pct:03d}_{name}"
+            try:
+                shutil.copy2(full, dest_dir / dest_name)
+                copied += 1
+            except Exception as e:
+                print(f"[warn] 复制失败 {name}: {e}")
+        print(f"\n[done] 已分拣 {copied} 张 -> {sort_dir}")
+        print(f"       good/ ({n_good} 张)  bad/ ({len(rows)-n_good} 张)")
+        print(f"       文件名前缀=P(good)百分比，文件夹内可按名称排序看最像/最不像")
 
 
 if __name__ == "__main__":
