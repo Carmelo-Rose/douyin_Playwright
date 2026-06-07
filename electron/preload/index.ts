@@ -27,6 +27,8 @@ export interface MlApi {
   train(): Promise<MlJobResult>;
   listSorted(runDir: string): Promise<SortedImage[]>;
   flipImage(p: { path: string; to: "good" | "bad" }): Promise<SortedImage | null>;
+  removeImage(p: { path: string }): Promise<{ trashPath: string } | null>;
+  restoreImage(p: { trashPath: string }): Promise<SortedImage | null>;
   getReport(): Promise<TrainReport | null>;
   cancel(jobId: string): Promise<boolean>;
   onLog(cb: (e: MlLogEvent) => void): () => void;
@@ -77,6 +79,8 @@ const api: VpApi = {
     train: () => ipcRenderer.invoke(IPC.mlTrain),
     listSorted: (runDir) => ipcRenderer.invoke(IPC.mlListSorted, runDir),
     flipImage: (p) => ipcRenderer.invoke(IPC.mlFlipImage, p),
+    removeImage: (p) => ipcRenderer.invoke(IPC.mlRemoveImage, p),
+    restoreImage: (p) => ipcRenderer.invoke(IPC.mlRestoreImage, p),
     getReport: () => ipcRenderer.invoke(IPC.mlGetReport),
     cancel: (jobId) => ipcRenderer.invoke(IPC.mlCancel, jobId),
     onLog: (cb) => {

@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit",
     "build": "tsc",
     "start": "electron-vite build && electron .",
+    "dedup": "python scripts/dedup_output.py --output-dir output",
     "dev": "electron-vite dev",
     "build:app": "electron-vite build",
     "preview": "electron-vite preview",

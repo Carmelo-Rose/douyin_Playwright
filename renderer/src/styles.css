@@ -33,3 +33,105 @@ th { background: #f0f2f6; position: sticky; top: 0; }
 .muted { color: #8a93a3; font-size: 12px; }
 fieldset { border: 1px solid #e6e8ec; border-radius: 8px; margin-bottom: 16px; padding: 12px 16px; }
 legend { font-size: 13px; font-weight: 600; color: #3a55d6; padding: 0 6px; }
+
+/* ④ 纠错区：栏内独立滚动，主页面不被撑长、点击不跳顶 */
+.mlgrid {
+  max-height: 62vh;
+  overflow-y: auto;
+  align-content: flex-start;
+  padding: 2px;
+  border: 1px solid #eef0f4;
+  border-radius: 8px;
+  background: #fafbfc;
+}
+
+/* 默认 / 边界图 边框 */
+.mlcell { border: 1px solid #e6e8ec; }
+.mlcell.boundary { border: 2px solid #f0a500; }
+
+/* ④ 纠错区：hover 操作按钮 / 高亮 / 大图预览 / 删除撤销浮条 */
+.mlcell .mlcell-actions {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: none;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0));
+}
+.mlcell:hover .mlcell-actions { display: flex; }
+.mlcell-actions button {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #1f2733;
+  font-size: 13px;
+  line-height: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mlcell-actions button:hover { background: #fff; }
+.mlcell-actions button:last-child:hover { background: #ffdede; color: #a13030; }
+
+/* flash 用蓝色脉冲，和边界图的橙色静态框区分开 */
+@keyframes mlflash {
+  0% { box-shadow: 0 0 0 0 rgba(58, 85, 214, 0.9); }
+  100% { box-shadow: 0 0 0 7px rgba(58, 85, 214, 0); }
+}
+.mlcell.flash { animation: mlflash 1.5s ease-out; border-color: #3a55d6 !important; }
+
+.ml-undo {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #11151c;
+  color: #e6ecf5;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+  z-index: 100;
+}
+.ml-undo code { color: #ffd479; background: rgba(255, 255, 255, 0.08); padding: 1px 6px; border-radius: 4px; }
+.ml-undo button {
+  background: #3a55d6;
+  color: #fff;
+  border: none;
+  padding: 5px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.ml-lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.78);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  z-index: 200;
+  cursor: zoom-out;
+}
+.ml-lightbox img {
+  max-width: 86vw;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+  cursor: default;
+}
+.ml-lightbox-meta { color: #d6e2f0; font-size: 13px; }

@@ -29,6 +29,8 @@ export const IPC = {
   mlPredict: "ml:predict",
   mlListSorted: "ml:listSorted",
   mlFlipImage: "ml:flipImage",
+  mlRemoveImage: "ml:removeImage",
+  mlRestoreImage: "ml:restoreImage",
   mlMerge: "ml:merge",
   mlTrain: "ml:train",
   mlGetReport: "ml:getReport",

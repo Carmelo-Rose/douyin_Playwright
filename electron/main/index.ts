@@ -90,7 +90,20 @@ function createWindow(): void {
   });
 
   if (process.env.ELECTRON_RENDERER_URL) {
-    win.loadURL(process.env.ELECTRON_RENDERER_URL);
+    // dev 模式：等 Vite devserver 就绪再加载，避免白屏
+    const url = process.env.ELECTRON_RENDERER_URL;
+    const waitAndLoad = async () => {
+      for (let i = 0; i < 30; i++) {
+        try {
+          await fetch(url, { signal: AbortSignal.timeout(500) });
+          break;
+        } catch {
+          await new Promise((r) => setTimeout(r, 300));
+        }
+      }
+      win.loadURL(url);
+    };
+    waitAndLoad();
   } else {
     win.loadFile(path.join(__dirname, "../renderer/index.html"));
   }
@@ -431,6 +444,34 @@ function registerMlIpc(): void {
     const dest = path.join(destDir, path.basename(abs));
     await fsp.rename(abs, dest);
     return { name: path.basename(dest), path: dest, url: mediaUrl(dest), label: p.to, pGood: parsePGood(path.basename(dest)) };
+  });
+
+  // 软删除：把图移到 runDir/_trash/<good|bad>/ 下，可撤销。合并训练时忽略 _trash/。
+  ipcMain.handle(IPC.mlRemoveImage, async (_e, p: { path: string }): Promise<{ trashPath: string } | null> => {
+    const abs = path.resolve(p.path);
+    if (!isAllowedMedia(abs)) return null;
+    const label = path.basename(path.dirname(abs)); // good | bad
+    const runDir = path.dirname(path.dirname(abs));
+    const trashDir = path.join(runDir, "_trash", label);
+    allowMedia(trashDir);
+    await fsp.mkdir(trashDir, { recursive: true });
+    const dest = path.join(trashDir, path.basename(abs));
+    await fsp.rename(abs, dest);
+    return { trashPath: dest };
+  });
+
+  // 撤销软删除：从 _trash/<good|bad>/ 移回 runDir/<good|bad>/
+  ipcMain.handle(IPC.mlRestoreImage, async (_e, p: { trashPath: string }): Promise<SortedImage | null> => {
+    const abs = path.resolve(p.trashPath);
+    if (!isAllowedMedia(abs)) return null;
+    const label = path.basename(path.dirname(abs)) as "good" | "bad";
+    if (label !== "good" && label !== "bad") return null;
+    const runDir = path.dirname(path.dirname(path.dirname(abs))); // runDir/_trash/<label>/<file>
+    const destDir = path.join(runDir, label);
+    await fsp.mkdir(destDir, { recursive: true });
+    const dest = path.join(destDir, path.basename(abs));
+    await fsp.rename(abs, dest);
+    return { name: path.basename(dest), path: dest, url: mediaUrl(dest), label, pGood: parsePGood(path.basename(dest)) };
   });
 
   ipcMain.handle(IPC.mlGetReport, async (): Promise<TrainReport | null> => {

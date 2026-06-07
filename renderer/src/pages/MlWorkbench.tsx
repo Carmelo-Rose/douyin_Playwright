@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type {
   MlEnvReport,
   MlLogEvent,
@@ -33,6 +33,53 @@ export default function MlWorkbench() {
   const stepRef = useRef<Step | null>(null);
   const runRef = useRef<MlRunPaths | null>(null);
 
+  // 纠错操作后保持两栏各自的内部滚动位置，避免点击后回到栏顶
+  const pendingGridScroll = useRef<number[] | null>(null);
+
+  const keepScroll = useCallback(() => {
+    const grids = document.querySelectorAll<HTMLDivElement>(".mlgrid");
+    pendingGridScroll.current = Array.from(grids).map((g) => g.scrollTop);
+  }, []);
+
+  useLayoutEffect(() => {
+    const saved = pendingGridScroll.current;
+    if (!saved) return;
+    pendingGridScroll.current = null;
+    const grids = document.querySelectorAll<HTMLDivElement>(".mlgrid");
+    grids.forEach((g, i) => {
+      if (saved[i] != null) g.scrollTop = saved[i];
+    });
+  });
+
+  // ④ 纠错区交互状态
+  const PAGE_SIZE = 60;
+  const [shownGood, setShownGood] = useState(PAGE_SIZE);
+  const [shownBad, setShownBad] = useState(PAGE_SIZE);
+  const [lightbox, setLightbox] = useState<SortedImage | null>(null);
+  const [flashPaths, setFlashPaths] = useState<Record<string, number>>({});
+  const [trash, setTrash] = useState<{ img: SortedImage; trashPath: string } | null>(null);
+  const trashTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // 高亮一张刚移动/恢复的图 ~1.5s
+  const flash = useCallback((path: string) => {
+    setFlashPaths((prev) => ({ ...prev, [path]: Date.now() }));
+    setTimeout(() => {
+      setFlashPaths((prev) => {
+        const next = { ...prev };
+        delete next[path];
+        return next;
+      });
+    }, 1600);
+  }, []);
+
+  // ESC 关闭大图预览
+  useEffect(() => {
+    if (!lightbox) return;
+    const onKey = (ev: KeyboardEvent) => ev.key === "Escape" && setLightbox(null);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [lightbox]);
+
   // 初始化
   useEffect(() => {
     window.vp.ml.getSettings().then(setSettings);
@@ -52,7 +99,11 @@ export default function MlWorkbench() {
         setBusy(null);
         jobIdRef.current = null;
         if (e.code === 0 && step === "predict" && runRef.current) {
-          window.vp.ml.listSorted(runRef.current.runDir).then(setSorted);
+          window.vp.ml.listSorted(runRef.current.runDir).then((list) => {
+            setSorted(list);
+            setShownGood(PAGE_SIZE);
+            setShownBad(PAGE_SIZE);
+          });
         } else if (e.code === 0 && step === "train") {
           window.vp.ml.getReport().then(setReport);
           detect();
@@ -124,8 +175,33 @@ export default function MlWorkbench() {
     const to = img.label === "good" ? "bad" : "good";
     const updated = await window.vp.ml.flipImage({ path: img.path, to });
     if (updated) {
+      keepScroll();
+      // 替换数组中对应项，保持原有顺序 → 列表不整体重排，滚动位置不跳
       setSorted((prev) => prev.map((s) => (s.path === img.path ? updated : s)));
+      flash(updated.path);
     }
+  };
+
+  const onRemove = async (img: SortedImage) => {
+    const res = await window.vp.ml.removeImage({ path: img.path });
+    if (!res) return;
+    keepScroll();
+    setSorted((prev) => prev.filter((s) => s.path !== img.path));
+    if (trashTimer.current) clearTimeout(trashTimer.current);
+    setTrash({ img, trashPath: res.trashPath });
+    trashTimer.current = setTimeout(() => setTrash(null), 5000);
+  };
+
+  const onUndoRemove = async () => {
+    if (!trash) return;
+    if (trashTimer.current) clearTimeout(trashTimer.current);
+    const restored = await window.vp.ml.restoreImage({ trashPath: trash.trashPath });
+    if (restored) {
+      keepScroll();
+      setSorted((prev) => [...prev, restored]);
+      flash(restored.path);
+    }
+    setTrash(null);
   };
 
   const onMerge = async () => {
@@ -224,13 +300,21 @@ export default function MlWorkbench() {
         ) : (
           <div className="row">
             <div className="field" style={{ flex: 1 }}>
-              <label>本地图片文件夹</label>
+              <label>本地图片文件夹（输入）</label>
               <input value={folder} readOnly placeholder="点右侧选择…" />
             </div>
             <button className="ghost" onClick={onSelectFolder}>选择文件夹…</button>
           </div>
         )}
         {imagesDir && <p className="muted">输入目录：{imagesDir}</p>}
+        {run && (
+          <p className="muted">
+            识图结果将分拣到：<strong>{run.runDir}</strong> 下的 <code>good/</code> 和 <code>bad/</code> 子目录
+          </p>
+        )}
+        {!run && (folder || imagesDir) && (
+          <p className="muted">点「开始识图」后自动创建带时间戳的输出目录，结果分入 good/ 和 bad/</p>
+        )}
       </fieldset>
 
       {/* ③ 识图分拣 */}
@@ -254,36 +338,76 @@ export default function MlWorkbench() {
       {/* ④ 纠错 */}
       {sorted.length > 0 && (
         <fieldset>
-          <legend>④ 纠错（点图片把它移到另一侧；边界图最值得纠）</legend>
-          <div style={{ display: "flex", gap: 16 }}>
-            {([["good", good], ["bad", bad]] as const).map(([label, items]) => (
-              <div key={label} style={{ flex: 1 }}>
-                <p className="muted">{label === "good" ? "✅ good" : "🚫 bad"}（{items.length}）</p>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                  {items.map((img) => {
-                    const boundary = img.pGood >= 0.4 && img.pGood <= 0.6;
-                    return (
-                      <div
-                        key={img.path}
-                        onClick={() => onFlip(img)}
-                        title={`P(good)=${img.pGood >= 0 ? img.pGood.toFixed(2) : "?"} · 点击移到另一侧`}
-                        style={{
-                          width: 88, cursor: "pointer", border: boundary ? "2px solid #f0a500" : "1px solid #e6e8ec",
-                          borderRadius: 6, overflow: "hidden", background: "#fff",
-                        }}
-                      >
-                        <img src={img.url} style={{ width: "100%", height: 88, objectFit: "cover", display: "block" }} />
-                        <div style={{ fontSize: 11, textAlign: "center", padding: "2px 0" }}>
-                          {img.pGood >= 0 ? `${Math.round(img.pGood * 100)}%` : "?"}
+          <legend>④ 纠错（鼠标移到图片上：移到另一侧 / 放大 / 删除；边界图最值得纠）</legend>
+          <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
+            {([["good", good, shownGood, setShownGood], ["bad", bad, shownBad, setShownBad]] as const).map(
+              ([label, items, shown, setShown]) => (
+                <div key={label} style={{ flex: 1, minWidth: 0 }}>
+                  <p className="muted">{label === "good" ? "✅ good" : "🚫 bad"}（{items.length}）</p>
+                  <div className="mlgrid" style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                    {items.slice(0, shown).map((img) => {
+                      const boundary = img.pGood >= 0.4 && img.pGood <= 0.6;
+                      const flashing = flashPaths[img.path] != null;
+                      return (
+                        <div
+                          key={img.path}
+                          className={`mlcell${flashing ? " flash" : ""}${boundary ? " boundary" : ""}`}
+                          title={`P(good)=${img.pGood >= 0 ? img.pGood.toFixed(2) : "?"}`}
+                          style={{
+                            width: 88, position: "relative",
+                            borderRadius: 6, overflow: "hidden", background: "#fff",
+                          }}
+                        >
+                          <img src={img.url} style={{ width: "100%", height: 88, objectFit: "cover", display: "block" }} />
+                          <div style={{ fontSize: 11, textAlign: "center", padding: "2px 0" }}>
+                            {img.pGood >= 0 ? `${Math.round(img.pGood * 100)}%` : "?"}
+                          </div>
+                          <div className="mlcell-actions">
+                            <button
+                              title={label === "good" ? "移到 bad →" : "← 移到 good"}
+                              onClick={() => onFlip(img)}
+                            >
+                              {label === "good" ? "→" : "←"}
+                            </button>
+                            <button title="放大查看" onClick={() => setLightbox(img)}>🔍</button>
+                            <button title="删除（可撤销）" onClick={() => onRemove(img)}>✕</button>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
+                  {items.length > shown && (
+                    <button
+                      className="ghost"
+                      style={{ marginTop: 8 }}
+                      onClick={() => setShown((n) => n + PAGE_SIZE)}
+                    >
+                      加载更多（还剩 {items.length - shown}）
+                    </button>
+                  )}
                 </div>
-              </div>
-            ))}
+              ),
+            )}
           </div>
         </fieldset>
+      )}
+
+      {/* 删除撤销浮条 */}
+      {trash && (
+        <div className="ml-undo">
+          已删除 <code>{trash.img.name}</code>
+          <button onClick={onUndoRemove}>撤销</button>
+        </div>
+      )}
+
+      {/* 大图预览 */}
+      {lightbox && (
+        <div className="ml-lightbox" onClick={() => setLightbox(null)}>
+          <img src={lightbox.url} onClick={(e) => e.stopPropagation()} />
+          <div className="ml-lightbox-meta">
+            {lightbox.name} · P(good)={lightbox.pGood >= 0 ? lightbox.pGood.toFixed(2) : "?"} · {lightbox.label}
+          </div>
+        </div>
       )}
 
       {/* ⑤ 合并 + 重训 */}
