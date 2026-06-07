@@ -82,7 +82,9 @@ function createWindow(): void {
     width: 1100,
     height: 760,
     webPreferences: {
-      preload: path.join(app.getAppPath(), "out/preload/index.mjs"),
+      // dev 模式：__dirname = out/main/（electron-vite 虚拟），../preload/index.mjs 指向实时编译产物
+      // prod 模式：__dirname = out/main/，路径相同，同样正确
+      preload: path.join(__dirname, "../preload/index.mjs"),
       sandbox: false,
     },
   });
@@ -90,7 +92,7 @@ function createWindow(): void {
   if (process.env.ELECTRON_RENDERER_URL) {
     win.loadURL(process.env.ELECTRON_RENDERER_URL);
   } else {
-    win.loadFile(path.join(app.getAppPath(), "out/renderer/index.html"));
+    win.loadFile(path.join(__dirname, "../renderer/index.html"));
   }
 }
 
@@ -346,6 +348,7 @@ function registerMlIpc(): void {
     }
     const modelDim = report?.feature_dim ?? null;
     const bDim = backboneDim(s.backbone) || null;
+    const modelBackbone = report?.backbone ?? null;
     return {
       pythonPath: python,
       ok: !probe.error && probe.missing.length === 0,
@@ -355,6 +358,8 @@ function registerMlIpc(): void {
       modelDim,
       backboneDim: bDim,
       dimMismatch: Boolean(modelDim && bDim && modelDim !== bDim),
+      modelBackbone,
+      backboneMismatch: Boolean(modelBackbone && modelBackbone !== s.backbone),
       report,
       error: probe.error,
     };

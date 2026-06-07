@@ -8,6 +8,7 @@ import { attachNetworkCapture, type NetworkCaptureHandle } from "./networkCaptur
 import { dedupeVideos } from "./normalize.js";
 import { waitForDouyinLogin } from "./login.js";
 import { enrichDouyinDetailImages } from "./detailImages.js";
+import { loadSeenIds, saveSeenIds } from "../../seenIds.js";
 
 const JINGXUAN_HOME = "https://www.douyin.com/jingxuan";
 const ROOT_SEARCH_AID = "31f360ee-d884-44a8-ab0b-34086c05f4fa";
@@ -31,19 +32,34 @@ export async function captureDouyin(config: AppConfig): Promise<void> {
       ...(await captureRootSearch(page, capture, config)),
     ];
 
+    const seenIds = loadSeenIds(config.outputDir, "douyin", config.keyword);
+    const dedupedAll = dedupeVideos(allVideos);
+    const newVideos = dedupedAll.filter((v) => !seenIds.has(v.awemeId));
+    console.log(`[seenIds] 已见过 ${seenIds.size} 条，本次新抓 ${newVideos.length}/${dedupedAll.length} 条（过滤重复 ${dedupedAll.length - newVideos.length} 条）`);
+
     const videos = filterByRelevance(
-      filterByMaxAgeDays(dedupeVideos(allVideos), config.maxAgeDays),
+      filterByMaxAgeDays(newVideos, config.maxAgeDays),
       config.relevanceKeywords,
     );
 
     if (videos.length === 0) {
-      console.warn("No video records were recognized after source capture and time filtering. Try DEBUG_CAPTURE=true to inspect XHR URLs and dumped JSON in output/debug-douyin-*.json.");
+      const rawCount = allVideos.length;
+      const dedupedCount = dedupedAll.length;
+      const newCount = newVideos.length;
+      const afterAge = filterByMaxAgeDays(newVideos, config.maxAgeDays).length;
+      console.warn(
+        `[douyin] 无可导出内容。raw=${rawCount} → 去重=${dedupedCount} → 新增=${newCount} → maxAgeDays(${config.maxAgeDays}天)=${afterAge} → 相关性过滤后=0。` +
+        `\n建议：放宽 publishTime（当前=${config.publishTime}）或减小 maxAgeDays（当前=${config.maxAgeDays}），或开 DEBUG_CAPTURE=true 查看 output/debug-douyin-*.json。`,
+      );
       return;
     }
 
     const enrichedVideos = await enrichDouyinDetailImages(page, videos, config);
     const outputPath = await exportVideosToXlsx(enrichedVideos, config.outputDir, config.keyword, config.contentType);
     console.log(`Exported ${enrichedVideos.length} videos to ${outputPath}`);
+
+    // 把本次导出的 ID 写入缓存，供下次运行去重
+    saveSeenIds(config.outputDir, "douyin", config.keyword, enrichedVideos.map((v) => v.awemeId));
   } finally {
     await context.close();
   }

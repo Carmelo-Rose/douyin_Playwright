@@ -79,6 +79,7 @@ export interface TrainReport {
   samples_dedup?: number;
   good_dedup?: number;
   bad_dedup?: number;
+  backbone?: string; // 训练时用的 backbone（新模型才有）
   feature_dim?: number;
   cv_random_leak_acc?: number;
   cv_groupkfold_acc?: number;
@@ -99,6 +100,8 @@ export interface MlEnvReport {
   modelDim: number | null; // train_report.feature_dim
   backboneDim: number | null; // 所选 backbone 期望维度
   dimMismatch: boolean; // modelDim ≠ backboneDim（predict 会崩）
+  modelBackbone: string | null; // 模型训练时记录的 backbone（旧模型为 null）
+  backboneMismatch: boolean; // 所选 backbone ≠ 模型记录的 backbone（结果会乱，即使维度相同）
   report: TrainReport | null;
   error?: string;
 }

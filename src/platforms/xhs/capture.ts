@@ -9,6 +9,7 @@ import { attachXhsNetworkCapture, type XhsNetworkCaptureHandle } from "./network
 import { dedupeNotes, formatCreateTimeFromNoteId, resolveXhsDisplayDateStable } from "./normalize.js";
 import { enrichXhsDetailImages } from "./detailImages.js";
 import { scoreXhsVisualQuality } from "./visualFilter.js";
+import { loadSeenIds, saveSeenIds } from "../../seenIds.js";
 
 const XHS_SEARCH_URL = "https://www.xiaohongshu.com/search_result";
 const XHS_TEXT = {
@@ -52,13 +53,18 @@ export async function captureXhs(config: AppConfig): Promise<void> {
 
     const notes = await captureXhsSearch(page, capture, config);
     const uniqueNotes = dedupeNotes(notes);
-    const typedNotes = filterNotesByContentType(uniqueNotes, config.contentType);
+
+    const seenIds = loadSeenIds(config.outputDir, "xhs", config.keyword);
+    const newNotes = uniqueNotes.filter((n) => !seenIds.has(n.noteId));
+    console.log(`[seenIds] 已见过 ${seenIds.size} 条，本次新抓 ${newNotes.length}/${uniqueNotes.length} 条（过滤重复 ${uniqueNotes.length - newNotes.length} 条）`);
+
+    const typedNotes = filterNotesByContentType(newNotes, config.contentType);
     const recentNotes = filterByMaxAgeDays(typedNotes, config.maxAgeDays);
     const deduped = filterByRelevance(recentNotes, config.relevanceKeywords);
 
     if (deduped.length === 0) {
       console.warn(
-        `No Xiaohongshu notes left to export. raw=${notes.length}, deduped=${uniqueNotes.length}, ${config.contentType}=${typedNotes.length}, recent=${recentNotes.length}, relevant=${deduped.length}.`,
+        `No Xiaohongshu notes left to export. raw=${notes.length}, deduped=${uniqueNotes.length}, new=${newNotes.length}, ${config.contentType}=${typedNotes.length}, recent=${recentNotes.length}, relevant=${deduped.length}.`,
       );
       if (notes.length === 0) {
         console.warn("No Xiaohongshu note records were recognized from network responses. Run DEBUG_CAPTURE=true npm run probe:xhs to inspect output/debug-xhs-*.json.");
@@ -70,6 +76,9 @@ export async function captureXhs(config: AppConfig): Promise<void> {
     const scoredNotes = await scoreXhsVisualQuality(enrichedNotes, config);
     const outputPath = await exportNotesToXlsx(scoredNotes, config.outputDir, config.keyword);
     console.log(`Exported ${scoredNotes.length} notes to ${outputPath}`);
+
+    // 把本次导出的 ID 写入缓存，供下次运行去重
+    saveSeenIds(config.outputDir, "xhs", config.keyword, scoredNotes.map((n) => n.noteId));
   } finally {
     await context.close();
   }

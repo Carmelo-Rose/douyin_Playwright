@@ -162,6 +162,14 @@ export default function MlWorkbench() {
             ⚠️ backbone 维度({env.backboneDim})与已训练模型({env.modelDim})不一致，识图会报错。请把 backbone 改回与模型匹配的值。
           </div>
         )}
+        {env && env.ok && !env.dimMismatch && env.backboneMismatch && (
+          <div className="banner captcha">
+            ⚠️ 当前 backbone「{settings?.backbone}」与模型训练时用的「{env.modelBackbone}」不一致。两者维度相同但特征空间不同，识图结果会是错的。请改回「{env.modelBackbone}」，或用当前 backbone 重训。
+          </div>
+        )}
+        {env && env.ok && env.hasModel && !env.modelBackbone && (
+          <p className="muted">提示：现有模型未记录训练 backbone，客户端只能比对维度、无法校验 backbone 身份。重训一次即可启用该校验。</p>
+        )}
         <div className="row">
           <div className="field" style={{ flex: 1 }}>
             <label>Python 路径（留空自动探测 python3/python）</label>
