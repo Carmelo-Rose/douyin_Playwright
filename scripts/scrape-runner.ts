@@ -20,7 +20,12 @@ function readConfigArg(): AppConfig {
     throw new Error("scrape-runner 缺少 --config <jsonPath> 参数");
   }
   const raw = readFileSync(process.argv[idx + 1], "utf-8");
-  return JSON.parse(raw) as AppConfig;
+  const config = JSON.parse(raw) as AppConfig;
+  // 密钥经 env 传入（JSON 里留空），回填到 config 供 visualFilter 读取
+  if (!config.dashscopeApiKey) {
+    config.dashscopeApiKey = process.env.DASHSCOPE_API_KEY?.trim() || "";
+  }
+  return config;
 }
 
 async function main(): Promise<void> {

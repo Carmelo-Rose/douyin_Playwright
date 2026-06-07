@@ -21,7 +21,12 @@ export default function ScrapeForm({ config, setConfig, hasApiKey, onApiKeyChang
   const num = (key: keyof AppConfig) => ({
     type: "number" as const,
     value: config[key] as number,
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => set(key, Number(e.target.value) as AppConfig[typeof key]),
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+      const raw = e.target.value;
+      if (raw === "") return;
+      const n = Number(raw);
+      if (Number.isFinite(n)) set(key, n as AppConfig[typeof key]);
+    },
   });
 
   const bool = (key: keyof AppConfig) => ({

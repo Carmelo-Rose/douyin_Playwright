@@ -3,8 +3,9 @@ import type { AppConfig, ScrapeLogEvent } from "../../electron/shared/ipc";
 import ScrapeForm from "./pages/ScrapeForm";
 import RunConsole from "./pages/RunConsole";
 import Results from "./pages/Results";
+import MlWorkbench from "./pages/MlWorkbench";
 
-type Tab = "scrape" | "run" | "results";
+type Tab = "scrape" | "run" | "results" | "ml";
 
 export default function App() {
   const [tab, setTab] = useState<Tab>("scrape");
@@ -47,9 +48,10 @@ export default function App() {
   }, []);
 
   const cancel = useCallback(async () => {
-    if (runId) await window.vp.cancelScrape(runId);
+    const id = runIdRef.current;
+    if (id) await window.vp.cancelScrape(id);
     setRunning(false);
-  }, [runId]);
+  }, []);
 
   if (!config) return <div className="page">加载设置中…</div>;
 
@@ -59,6 +61,7 @@ export default function App() {
         <button className={`tab ${tab === "scrape" ? "active" : ""}`} onClick={() => setTab("scrape")}>抓取设置</button>
         <button className={`tab ${tab === "run" ? "active" : ""}`} onClick={() => setTab("run")}>运行日志</button>
         <button className={`tab ${tab === "results" ? "active" : ""}`} onClick={() => setTab("results")}>结果浏览</button>
+        <button className={`tab ${tab === "ml" ? "active" : ""}`} onClick={() => setTab("ml")}>ML 工作台</button>
       </div>
 
       {tab === "scrape" && (
@@ -79,6 +82,7 @@ export default function App() {
         <RunConsole logs={logs} running={running} banner={banner} onCancel={cancel} outputDir={outputDir} />
       )}
       {tab === "results" && <Results outputDir={outputDir} />}
+      {tab === "ml" && <MlWorkbench />}
     </div>
   );
 }

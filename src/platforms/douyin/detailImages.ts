@@ -33,14 +33,17 @@ export async function enrichDouyinDetailImages(
     return videos.map((video, index) => markFallbackImages(video, index < limit ? "未启用详情补图" : "未补图"));
   }
 
+  // UI 可传入 0，强制下限为 1 防止 slice(0,0) 清空所有图片
+  const imageLimit = Math.max(1, config.detailImageLimit);
+
   console.log(
-    `Douyin detail image enrichment enabled: items=${limit}/${videos.length}, imagesPerItem=${config.detailImageLimit}, delay=${config.detailMinDelayMs}-${config.detailMaxDelayMs}ms.`,
+    `Douyin detail image enrichment enabled: items=${limit}/${videos.length}, imagesPerItem=${imageLimit}, delay=${config.detailMinDelayMs}-${config.detailMaxDelayMs}ms.`,
   );
 
   for (let index = 0; index < videos.length; index += 1) {
     const video = videos[index];
-    if (video.imageUrls.length >= config.detailImageLimit) {
-      video.imageUrls = mergeImageUrls(video.imageUrls, "").slice(0, config.detailImageLimit);
+    if (video.imageUrls.length >= imageLimit) {
+      video.imageUrls = mergeImageUrls(video.imageUrls, "").slice(0, imageLimit);
       video.detailImageStatus = `搜索接口图文图片（${video.imageUrls.length}张）`;
       continue;
     }
@@ -54,7 +57,7 @@ export async function enrichDouyinDetailImages(
       await sleep(randomDelay(config));
     }
 
-    const result = await collectDetailImages(page, video, config);
+    const result = await collectDetailImages(page, video, config, imageLimit);
     if (result.stop) {
       markFallbackImages(video, result.status);
       for (let rest = index + 1; rest < videos.length; rest += 1) {
@@ -64,8 +67,11 @@ export async function enrichDouyinDetailImages(
     }
 
     if (result.imageUrls.length > 0) {
-      video.imageUrls = mergeImageUrls([...video.imageUrls, ...result.imageUrls], "").slice(0, config.detailImageLimit);
+      // 详情高清图排前，搜索缩略图补位，避免低清图占满槽位
+      video.imageUrls = mergeImageUrls([...result.imageUrls, ...video.imageUrls], "").slice(0, imageLimit);
       video.detailImageStatus = `详情补图成功（${video.imageUrls.length}张）`;
+    } else if (video.imageUrls.length > 0) {
+      markFallbackImages(video, "详情未发现多图，保留搜索图片");
     } else {
       markFallbackImages(video, result.status || "详情未发现多图，使用封面");
     }
@@ -78,6 +84,7 @@ async function collectDetailImages(
   page: Page,
   video: VideoRecord,
   config: AppConfig,
+  imageLimit: number,
 ): Promise<{ imageUrls: string[]; status: string; stop: boolean }> {
   const networkUrls: string[] = [];
   const responseTasks: Promise<void>[] = [];
@@ -135,7 +142,7 @@ async function collectDetailImages(
 
   await Promise.allSettled(responseTasks);
 
-  const imageUrls = mergeImageUrls(networkUrls, "").slice(0, config.detailImageLimit);
+  const imageUrls = mergeImageUrls(networkUrls, "").slice(0, imageLimit);
   return { imageUrls, status: imageUrls.length > 0 ? "" : "详情未发现目标作品多图，使用封面", stop: false };
 }
 

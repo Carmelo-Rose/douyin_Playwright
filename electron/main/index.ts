@@ -1,20 +1,35 @@
-import { app, BrowserWindow, dialog, ipcMain, safeStorage, shell } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, protocol, safeStorage, shell } from "electron";
 import { fork, type ChildProcess } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import path from "node:path";
 import os from "node:os";
 import fs from "node:fs";
 import fsp from "node:fs/promises";
+import { StringDecoder } from "node:string_decoder";
 import ExcelJS from "exceljs";
 import Store from "electron-store";
 import { resolveConfig, type AppConfig } from "../../src/config.js";
+import { cancelJob, killAllJobs, runJob } from "./jobRunner.js";
+import { backboneDim, probePython, resolvePython } from "./pythonRunner.js";
 import {
   IPC,
+  type MlEnvReport,
+  type MlJobResult,
+  type MlRunPaths,
+  type MlSettings,
   type ResultFileMeta,
   type ResultSheet,
   type ScrapeLogEvent,
   type ScrapeStartResult,
+  type SortedImage,
+  type TrainReport,
 } from "../shared/ipc.js";
+
+// 自定义协议：在 renderer 里用 <img src="vpmedia://local/?p=<abs>"> 显示本地图片。
+// 必须在 app ready 前注册 scheme 权限。
+protocol.registerSchemesAsPrivileged([
+  { scheme: "vpmedia", privileges: { standard: true, secure: true, supportFetchAPI: true, bypassCSP: true } },
+]);
 
 // 设置存储：只存可序列化的覆盖项，不含密钥与路径（路径相对工作目录解析）
 type StoredOverrides = Partial<AppConfig>;
@@ -23,6 +38,17 @@ const store = new Store<{ overrides: StoredOverrides; apiKeyEnc: string }>();
 // 抓取产物与登录态的工作目录；relative path 在子进程里相对它解析
 const workDir = path.join(app.getPath("userData"), "workspace");
 const outputDir = path.join(workDir, "output");
+
+// 允许被结果页读取/打开的目录集合。默认目录 + 每次抓取实际写入的目录。
+const resultDirs = new Set<string>([path.resolve(outputDir)]);
+function isInResultDirs(p: string): boolean {
+  const abs = path.resolve(p);
+  for (const root of resultDirs) {
+    const rel = path.relative(root, abs);
+    if (rel && !rel.startsWith("..") && !path.isAbsolute(rel)) return true;
+  }
+  return false;
+}
 
 // 持久化字段中需要剔除的：密钥单独走 safeStorage，路径交给工作目录默认值
 const EXCLUDED_FIELDS: (keyof AppConfig)[] = ["dashscopeApiKey", "outputDir", "userDataDir"];
@@ -116,6 +142,7 @@ function registerIpc(): void {
     // 优先使用用户在设置页选择的路径，回退到默认 outputDir
     const resolvedOutputDir = config.outputDir || outputDir;
     fs.mkdirSync(resolvedOutputDir, { recursive: true });
+    resultDirs.add(path.resolve(resolvedOutputDir));
     // 把路径字段补回：子进程读 JSON 时这些字段不能为 undefined
     const runnerConfig: AppConfig = {
       ...config,
@@ -139,14 +166,15 @@ function registerIpc(): void {
     runningChildren.set(runId, child);
 
     const send = (level: ScrapeLogEvent["level"], line: string, status?: ScrapeLogEvent["status"]) => {
-      const payload: ScrapeLogEvent = { runId, level, line, status };
-      event.sender.send(IPC.scrapeLog, payload);
+      if (event.sender.isDestroyed()) return;
+      event.sender.send(IPC.scrapeLog, { runId, level, line, status });
     };
 
     const wire = (stream: NodeJS.ReadableStream | null, level: "info" | "error") => {
+      const decoder = new StringDecoder("utf8");
       let buf = "";
       stream?.on("data", (chunk: Buffer) => {
-        buf += chunk.toString("utf-8");
+        buf += decoder.write(chunk); // 不完整的多字节序列缓存到下一个 chunk
         const parts = buf.split(/\r?\n/);
         buf = parts.pop() ?? "";
         for (const line of parts) {
@@ -154,11 +182,16 @@ function registerIpc(): void {
           send(level, line, detectStatus(line));
         }
       });
+      stream?.on("end", () => {
+        buf += decoder.end();
+        if (buf.trim()) send(level, buf, detectStatus(buf));
+      });
     };
     wire(child.stdout, "info");
     wire(child.stderr, "error");
 
-    child.on("exit", (code) => {
+    // close 在 stdio 流全部关闭后触发，确保最后几行日志不会排在 [done] 之后
+    child.on("close", (code) => {
       runningChildren.delete(runId);
       void fsp.unlink(tmpPath).catch(() => {});
       send("status", code === 0 ? "[done] 抓取完成" : `[done] 抓取退出，code=${code}`, "done");
@@ -180,16 +213,16 @@ function registerIpc(): void {
   // —— 结果 ——
   ipcMain.handle(IPC.resultsList, async (): Promise<ResultFileMeta[]> => {
     try {
-      const names = await fsp.readdir(outputDir);
-      const metas = await Promise.all(
-        names
-          .filter((n) => n.toLowerCase().endsWith(".xlsx"))
-          .map(async (name) => {
-            const full = path.join(outputDir, name);
-            const st = await fsp.stat(full);
-            return { name, path: full, size: st.size, mtimeMs: st.mtimeMs };
-          }),
-      );
+      const metas: ResultFileMeta[] = [];
+      for (const dir of resultDirs) {
+        let names: string[] = [];
+        try { names = await fsp.readdir(dir); } catch { continue; }
+        for (const name of names.filter((n) => n.toLowerCase().endsWith(".xlsx"))) {
+          const full = path.join(dir, name);
+          const st = await fsp.stat(full);
+          metas.push({ name, path: full, size: st.size, mtimeMs: st.mtimeMs });
+        }
+      }
       return metas.sort((a, b) => b.mtimeMs - a.mtimeMs);
     } catch {
       return [];
@@ -197,6 +230,7 @@ function registerIpc(): void {
   });
 
   ipcMain.handle(IPC.resultsRead, async (_e, filePath: string): Promise<ResultSheet> => {
+    if (!isInResultDirs(filePath)) throw new Error("resultsRead: 路径越权");
     const wb = new ExcelJS.Workbook();
     await wb.xlsx.readFile(filePath);
     const ws = wb.worksheets[0];
@@ -221,12 +255,201 @@ function registerIpc(): void {
     return { columns, rows };
   });
 
-  ipcMain.handle(IPC.resultsOpen, (_e, filePath: string) => shell.openPath(filePath));
-  ipcMain.handle(IPC.resultsReveal, (_e, filePath: string) => shell.showItemInFolder(filePath));
+  ipcMain.handle(IPC.resultsOpen, (_e, filePath: string) =>
+    isInResultDirs(filePath) ? shell.openPath(filePath) : Promise.resolve("forbidden"),
+  );
+  ipcMain.handle(IPC.resultsReveal, (_e, filePath: string) => {
+    if (isInResultDirs(filePath)) shell.showItemInFolder(filePath);
+  });
+}
+
+// ========================= ML 工作台 =========================
+
+const mlStore = new Store<{ settings: MlSettings }>({ name: "ml" });
+const DEFAULT_ML: MlSettings = { pythonPath: "", backbone: "siglip2-l", threshold: 0.5, maxNotes: 0, imgsPerNote: 2 };
+const mlRunsDir = path.join(workDir, "ml-runs");
+const PREFIX_RE = /^(\d{1,3})_/; // predict 输出文件名前缀 087_xxx -> P(good)=0.87
+
+// vpmedia:// 只允许读这些根目录下的文件，防越权读任意路径
+const allowedMediaRoots = new Set<string>();
+function allowMedia(dir: string): void {
+  allowedMediaRoots.add(path.resolve(dir));
+}
+function isAllowedMedia(p: string): boolean {
+  const abs = path.resolve(p);
+  for (const root of allowedMediaRoots) {
+    const rel = path.relative(root, abs);
+    if (rel && !rel.startsWith("..") && !path.isAbsolute(rel)) return true;
+  }
+  return false;
+}
+function mediaUrl(abs: string): string {
+  return `vpmedia://local/?p=${encodeURIComponent(abs)}`;
+}
+function mimeFor(p: string): string {
+  const e = path.extname(p).toLowerCase();
+  if (e === ".png") return "image/png";
+  if (e === ".gif") return "image/gif";
+  if (e === ".webp") return "image/webp";
+  return "image/jpeg";
+}
+
+function getMlSettings(): MlSettings {
+  return { ...DEFAULT_ML, ...(mlStore.get("settings") ?? {}) };
+}
+function projectRoot(): string {
+  return app.getAppPath();
+}
+function mlEnv(s: MlSettings): NodeJS.ProcessEnv {
+  return { ...process.env, EMBED_BACKBONE: s.backbone, PYTHONIOENCODING: "utf-8" };
+}
+function parsePGood(name: string): number {
+  const m = PREFIX_RE.exec(name);
+  return m ? Number(m[1]) / 100 : -1;
+}
+
+async function startPyJob(event: Electron.IpcMainInvokeEvent, scriptFile: string, args: string[]): Promise<MlJobResult> {
+  const s = getMlSettings();
+  const python = await resolvePython(s.pythonPath);
+  const jobId = randomUUID();
+  runJob({
+    jobId,
+    command: python,
+    args: [path.join("ml", scriptFile), ...args],
+    cwd: projectRoot(),
+    env: mlEnv(s),
+    sender: event.sender,
+    channel: IPC.mlLog,
+  });
+  return { jobId };
+}
+
+function registerMlIpc(): void {
+  ipcMain.handle(IPC.mlGetSettings, () => getMlSettings());
+  ipcMain.handle(IPC.mlSetSettings, (_e, partial: Partial<MlSettings>) => {
+    mlStore.set("settings", { ...getMlSettings(), ...partial });
+    return true;
+  });
+
+  ipcMain.handle(IPC.mlDetectEnv, async (): Promise<MlEnvReport> => {
+    const s = getMlSettings();
+    const python = await resolvePython(s.pythonPath);
+    const probe = await probePython(python, projectRoot(), mlEnv(s));
+    const modelPath = path.join(projectRoot(), "ml/model/aesthetic_clf.joblib");
+    const reportPath = path.join(projectRoot(), "ml/model/train_report.json");
+    const hasModel = fs.existsSync(modelPath);
+    let report: TrainReport | null = null;
+    try {
+      report = JSON.parse(await fsp.readFile(reportPath, "utf-8")) as TrainReport;
+    } catch {
+      report = null;
+    }
+    const modelDim = report?.feature_dim ?? null;
+    const bDim = backboneDim(s.backbone) || null;
+    return {
+      pythonPath: python,
+      ok: !probe.error && probe.missing.length === 0,
+      pythonVersion: probe.pythonVersion,
+      missing: probe.missing,
+      hasModel,
+      modelDim,
+      backboneDim: bDim,
+      dimMismatch: Boolean(modelDim && bDim && modelDim !== bDim),
+      report,
+      error: probe.error,
+    };
+  });
+
+  ipcMain.handle(IPC.mlNewRun, async (): Promise<MlRunPaths> => {
+    const runId = randomUUID();
+    const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+    const runDir = path.join(mlRunsDir, stamp);
+    const toPredictDir = path.join(runDir, "to_predict");
+    await fsp.mkdir(toPredictDir, { recursive: true });
+    allowMedia(runDir);
+    return { runId, runDir, toPredictDir };
+  });
+
+  ipcMain.handle(IPC.mlSelectFolder, async (): Promise<string | null> => {
+    const r = await dialog.showOpenDialog({ title: "选择图片文件夹", properties: ["openDirectory"] });
+    if (r.canceled || !r.filePaths[0]) return null;
+    allowMedia(r.filePaths[0]);
+    return r.filePaths[0];
+  });
+
+  ipcMain.handle(IPC.mlExtract, (e, p: { xlsx: string; out: string; maxNotes: number; imgsPerNote: number }) => {
+    allowMedia(p.out);
+    const args = ["--input", p.xlsx, "--out", p.out, "--imgs-per-note", String(p.imgsPerNote)];
+    if (p.maxNotes > 0) args.push("--max-notes", String(p.maxNotes));
+    return startPyJob(e, "extract_images_only.py", args);
+  });
+
+  ipcMain.handle(IPC.mlPredict, (e, p: { input: string; sortTo: string; threshold: number }) => {
+    allowMedia(p.sortTo);
+    return startPyJob(e, "predict.py", ["--input", p.input, "--sort-to", p.sortTo, "--threshold", String(p.threshold)]);
+  });
+
+  ipcMain.handle(IPC.mlMerge, (e, p: { runDir: string }) => startPyJob(e, "merge_feedback.py", ["--from", p.runDir]));
+
+  ipcMain.handle(IPC.mlTrain, (e) => startPyJob(e, "train_singleimage.py", []));
+
+  ipcMain.handle(IPC.mlListSorted, async (_e, runDir: string): Promise<SortedImage[]> => {
+    allowMedia(runDir);
+    const out: SortedImage[] = [];
+    for (const label of ["good", "bad"] as const) {
+      const dir = path.join(runDir, label);
+      let names: string[] = [];
+      try {
+        names = await fsp.readdir(dir);
+      } catch {
+        continue;
+      }
+      for (const name of names) {
+        if (!/\.(png|jpe?g|webp|gif)$/i.test(name)) continue;
+        const abs = path.join(dir, name);
+        out.push({ name, path: abs, url: mediaUrl(abs), label, pGood: parsePGood(name) });
+      }
+    }
+    out.sort((a, b) => b.pGood - a.pGood);
+    return out;
+  });
+
+  ipcMain.handle(IPC.mlFlipImage, async (_e, p: { path: string; to: "good" | "bad" }): Promise<SortedImage | null> => {
+    const abs = path.resolve(p.path);
+    if (!isAllowedMedia(abs)) return null;
+    const runDir = path.dirname(path.dirname(abs)); // runDir/<good|bad>/<file>
+    const destDir = path.join(runDir, p.to);
+    await fsp.mkdir(destDir, { recursive: true });
+    const dest = path.join(destDir, path.basename(abs));
+    await fsp.rename(abs, dest);
+    return { name: path.basename(dest), path: dest, url: mediaUrl(dest), label: p.to, pGood: parsePGood(path.basename(dest)) };
+  });
+
+  ipcMain.handle(IPC.mlGetReport, async (): Promise<TrainReport | null> => {
+    try {
+      return JSON.parse(await fsp.readFile(path.join(projectRoot(), "ml/model/train_report.json"), "utf-8")) as TrainReport;
+    } catch {
+      return null;
+    }
+  });
+
+  ipcMain.handle(IPC.mlCancel, (_e, jobId: string) => cancelJob(jobId));
 }
 
 app.whenReady().then(() => {
+  protocol.handle("vpmedia", async (req) => {
+    const p = new URL(req.url).searchParams.get("p");
+    if (!p || !isAllowedMedia(p)) return new Response("forbidden", { status: 403 });
+    try {
+      const data = await fsp.readFile(p);
+      return new Response(new Uint8Array(data), { headers: { "content-type": mimeFor(p) } });
+    } catch {
+      return new Response("not found", { status: 404 });
+    }
+  });
+
   registerIpc();
+  registerMlIpc();
   createWindow();
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
@@ -235,5 +458,6 @@ app.whenReady().then(() => {
 
 app.on("window-all-closed", () => {
   for (const child of runningChildren.values()) child.kill();
+  killAllJobs();
   if (process.platform !== "darwin") app.quit();
 });

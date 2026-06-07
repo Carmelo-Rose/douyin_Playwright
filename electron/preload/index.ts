@@ -2,11 +2,35 @@ import { contextBridge, ipcRenderer } from "electron";
 import {
   IPC,
   type AppConfig,
+  type MlEnvReport,
+  type MlJobResult,
+  type MlLogEvent,
+  type MlRunPaths,
+  type MlSettings,
   type ResultFileMeta,
   type ResultSheet,
   type ScrapeLogEvent,
   type ScrapeStartResult,
+  type SortedImage,
+  type TrainReport,
 } from "../shared/ipc.js";
+
+export interface MlApi {
+  getSettings(): Promise<MlSettings>;
+  setSettings(partial: Partial<MlSettings>): Promise<boolean>;
+  detectEnv(): Promise<MlEnvReport>;
+  newRun(): Promise<MlRunPaths>;
+  selectFolder(): Promise<string | null>;
+  extract(p: { xlsx: string; out: string; maxNotes: number; imgsPerNote: number }): Promise<MlJobResult>;
+  predict(p: { input: string; sortTo: string; threshold: number }): Promise<MlJobResult>;
+  merge(p: { runDir: string }): Promise<MlJobResult>;
+  train(): Promise<MlJobResult>;
+  listSorted(runDir: string): Promise<SortedImage[]>;
+  flipImage(p: { path: string; to: "good" | "bad" }): Promise<SortedImage | null>;
+  getReport(): Promise<TrainReport | null>;
+  cancel(jobId: string): Promise<boolean>;
+  onLog(cb: (e: MlLogEvent) => void): () => void;
+}
 
 export interface VpApi {
   getSettings(): Promise<{ config: AppConfig; hasApiKey: boolean; outputDir: string }>;
@@ -21,6 +45,7 @@ export interface VpApi {
   readResult(filePath: string): Promise<ResultSheet>;
   openResult(filePath: string): Promise<string>;
   revealResult(filePath: string): Promise<void>;
+  ml: MlApi;
 }
 
 const api: VpApi = {
@@ -40,6 +65,26 @@ const api: VpApi = {
   readResult: (filePath) => ipcRenderer.invoke(IPC.resultsRead, filePath),
   openResult: (filePath) => ipcRenderer.invoke(IPC.resultsOpen, filePath),
   revealResult: (filePath) => ipcRenderer.invoke(IPC.resultsReveal, filePath),
+  ml: {
+    getSettings: () => ipcRenderer.invoke(IPC.mlGetSettings),
+    setSettings: (partial) => ipcRenderer.invoke(IPC.mlSetSettings, partial),
+    detectEnv: () => ipcRenderer.invoke(IPC.mlDetectEnv),
+    newRun: () => ipcRenderer.invoke(IPC.mlNewRun),
+    selectFolder: () => ipcRenderer.invoke(IPC.mlSelectFolder),
+    extract: (p) => ipcRenderer.invoke(IPC.mlExtract, p),
+    predict: (p) => ipcRenderer.invoke(IPC.mlPredict, p),
+    merge: (p) => ipcRenderer.invoke(IPC.mlMerge, p),
+    train: () => ipcRenderer.invoke(IPC.mlTrain),
+    listSorted: (runDir) => ipcRenderer.invoke(IPC.mlListSorted, runDir),
+    flipImage: (p) => ipcRenderer.invoke(IPC.mlFlipImage, p),
+    getReport: () => ipcRenderer.invoke(IPC.mlGetReport),
+    cancel: (jobId) => ipcRenderer.invoke(IPC.mlCancel, jobId),
+    onLog: (cb) => {
+      const listener = (_e: unknown, payload: MlLogEvent) => cb(payload);
+      ipcRenderer.on(IPC.mlLog, listener);
+      return () => ipcRenderer.removeListener(IPC.mlLog, listener);
+    },
+  },
 };
 
 contextBridge.exposeInMainWorld("vp", api);
