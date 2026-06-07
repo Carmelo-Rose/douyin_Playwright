@@ -2,9 +2,9 @@
 共享工具：图像 embedding。训练与预测共用，保证特征一致。
 支持多 backbone 并可拼接：CLIP / SigLIP2 / DINOv2。
 
-切换：环境变量 EMBED_BACKBONE，默认 "siglip2-l"。
-  - "clip-b32"     : open_clip ViT-B-32 (512维，旧基线)
-  - "siglip2-l"    : open_clip ViT-L-16-SigLIP2-384 / webli (1024维，当前默认)
+切换：环境变量 EMBED_BACKBONE，默认 "clip-b32"（第四版线上 backbone，经同口径消融选定）。
+  - "clip-b32"     : open_clip ViT-B-32 (512维，**当前默认 / 线上模型**)
+  - "siglip2-l"    : open_clip ViT-L-16-SigLIP2-384 / webli (1024维，消融中与 clip-b32 打平，未采用)
   - "dinov2-l"     : DINOv2 ViT-L/14 (1024维)
   - "aes-laion"    : LAION Aesthetic V2 美学分 (1维，可拼接，如 "clip-b32+aes-laion")
   - "siglip2-l+dinov2-l" : 用 + 拼接两者 (2048维)
@@ -28,7 +28,7 @@ CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 # 可选: "clip-b32" | "siglip2-l" | "dinov2-l" | "siglip2-l+dinov2-l"
 # strip 清洗：防止环境变量末尾带空格（cmd `set X=Y &&` 常见坑）
-BACKBONE = os.environ.get("EMBED_BACKBONE", "siglip2-l").strip()
+BACKBONE = os.environ.get("EMBED_BACKBONE", "clip-b32").strip()
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 
