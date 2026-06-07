@@ -28,22 +28,26 @@ const IS_WIN = process.platform === "win32";
 
 /**
  * 推导 Accio 内置 Python 路径。
- * Accio 把 node/python 放在同级目录：.../pre-install/<hash>/node/node(.exe) 与 .../python/python(.exe)。
- * 通过环境变量 ACCIO_NODE_BIN 拿到 node 路径，回溯到 pre-install 根再拼出 python。
+ * Accio 把 node/python 放在 <hash> 根目录下的兄弟目录，但两平台布局不同：
+ *   Windows: .../pre-install/<hash>/node/node.exe   与 .../python/python.exe        (扁平)
+ *   macOS:   .../external-tools/<hash>/node/bin/node 与 .../python/bin/python3       (POSIX 多一层 bin)
+ * 通过环境变量 ACCIO_NODE_BIN 拿到 node 二进制，从其所在目录逐层上溯，
+ * 在每一层尝试 <dir>/python/<exe>，existsSync 过滤——一套代码兼容两种层数，不写死。
  * 这条候选不依赖 PATH，可解决"内置 python 不在 PATH 首位/不在 PATH"的问题。
  */
 function builtinPythonCandidates(): string[] {
-  const out: string[] = [];
-  const exe = IS_WIN ? "python.exe" : "python3";
-  const exeAlt = IS_WIN ? "python3.exe" : "python";
-
-  // ACCIO_NODE_BIN: .../pre-install/<hash>/node/node(.exe) → 同级 python 目录
   const nodeBin = process.env.ACCIO_NODE_BIN?.trim();
-  if (nodeBin) {
-    const preInstallRoot = path.dirname(path.dirname(nodeBin)); // 去掉 node/node.exe 两层
-    for (const name of [exe, exeAlt]) {
-      out.push(path.join(preInstallRoot, "python", name));
+  if (!nodeBin) return [];
+
+  const exes = IS_WIN ? ["python.exe", "python3.exe"] : ["bin/python3", "bin/python"];
+  const out: string[] = [];
+  let dir = path.dirname(nodeBin);
+  // 向上最多 4 层：win 的 node/node.exe 上 1 层即命中，mac 的 node/bin/node 上 2 层命中
+  for (let i = 0; i < 4 && dir !== path.dirname(dir); i += 1) {
+    for (const rel of exes) {
+      out.push(path.join(dir, "python", rel));
     }
+    dir = path.dirname(dir);
   }
   return out.filter((p) => existsSync(p));
 }
