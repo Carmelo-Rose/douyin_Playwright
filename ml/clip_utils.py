@@ -6,6 +6,7 @@
   - "clip-b32"     : open_clip ViT-B-32 (512维，旧基线)
   - "siglip2-l"    : open_clip ViT-L-16-SigLIP2-384 / webli (1024维，当前默认)
   - "dinov2-l"     : DINOv2 ViT-L/14 (1024维)
+  - "aes-laion"    : LAION Aesthetic V2 美学分 (1维，可拼接，如 "clip-b32+aes-laion")
   - "siglip2-l+dinov2-l" : 用 + 拼接两者 (2048维)
 
 ⚠️ 换 backbone 必须区分缓存——缓存键带 feature_tag()（见 train_singleimage.py）。
@@ -81,10 +82,18 @@ def _embed_dinov2(img):
     return f.squeeze(0).cpu().numpy().astype(np.float32)
 
 
+def _embed_aes_laion(img):
+    """LAION 美学分作为 1 维特征。不 L2 归一化（单标量归一无意义，
+    尺度交给训练时的 StandardScaler）。"""
+    from aesthetic import aesthetic_score
+    return np.array([aesthetic_score(img)], dtype=np.float32)
+
+
 _PARTS = {
     "clip-b32": lambda img: _embed_open_clip(_load_clip_b32, img),
     "siglip2-l": lambda img: _embed_open_clip(_load_siglip2_l, img),
     "dinov2-l": _embed_dinov2,
+    "aes-laion": _embed_aes_laion,
 }
 
 

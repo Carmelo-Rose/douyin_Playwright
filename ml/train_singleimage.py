@@ -15,6 +15,7 @@
 - ml/model/aesthetic_clf.joblib   训练好的模型（含 scaler + 分类器）
 - ml/model/train_report.json      训练报告
 """
+import argparse
 import hashlib
 import json
 import re
@@ -201,6 +202,13 @@ def make_model():
 
 
 def main():
+    ap = argparse.ArgumentParser(description="单图审美分类器训练")
+    ap.add_argument("--no-dedup", action="store_true",
+                    help="跳过近似图去重，用全样本（backbone/特征公平对比用）")
+    ap.add_argument("--dedup-cosine", type=float, default=DEDUP_COSINE,
+                    help=f"组内近似图去重的余弦阈值，默认 {DEDUP_COSINE}")
+    args = ap.parse_args()
+
     samples = collect_samples()
     n_good = sum(1 for _, l in samples if l == 1)
     n_bad = len(samples) - n_good
@@ -213,8 +221,14 @@ def main():
     X, y, paths, groups = build_features(samples)
     print(f"[info] X={X.shape}  unique_groups={len(set(groups.tolist()))}")
 
-    # ---- 近似图去重（同笔记组内，余弦 >= 0.95 视为重复）----
-    Xd, yd, paths_d, groups_d, removed = dedup_near_duplicates(X, y, paths, groups)
+    # ---- 近似图去重（同笔记组内，余弦 >= 阈值视为重复）----
+    if args.no_dedup:
+        Xd, yd, paths_d, groups_d, removed = X, y, paths, groups, 0
+        print("[info] dedup: 关闭(全样本对比模式)")
+    else:
+        Xd, yd, paths_d, groups_d, removed = dedup_near_duplicates(
+            X, y, paths, groups, cos_thr=args.dedup_cosine
+        )
     n_groups_d = len(set(groups_d.tolist()))
     print(
         f"[info] dedup: 删除近似重复 {removed} 张 -> 剩 {len(yd)} 张, "
@@ -291,6 +305,8 @@ def main():
         "good_dedup": int((yd == 1).sum()),
         "bad_dedup": int((yd == 0).sum()),
         "n_note_groups": n_groups_d,
+        "dedup": ("off" if args.no_dedup else args.dedup_cosine),
+        "backbone": feature_tag(),  # 记录训练用的 backbone，供客户端校验身份（不只比维度）
         "feature_dim": int(X.shape[1]),
         "cv_random_leak_acc": round(m_leak["acc"], 3),
         "cv_groupkfold_acc": round(m_real["acc"], 3),

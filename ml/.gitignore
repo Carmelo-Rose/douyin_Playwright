@@ -1,5 +1,7 @@
 # 模型权重缓存（开源权重，可重新下载，勿入库）
 cache/
+# LAION 美学 predictor 权重（aesthetic.py 会自动下载，勿入库）
+weights/
 __pycache__/
 # 从 xlsx 提取的图片与中间产物（可由脚本重新生成）
 data/images/
