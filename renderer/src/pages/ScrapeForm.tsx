@@ -6,11 +6,12 @@ interface Props {
   setConfig: (c: AppConfig) => void;
   hasApiKey: boolean;
   onApiKeyChange: (key: string) => void;
+  defaultOutputDir: string;
   running: boolean;
   onStart: (config: AppConfig) => void;
 }
 
-export default function ScrapeForm({ config, setConfig, hasApiKey, onApiKeyChange, running, onStart }: Props) {
+export default function ScrapeForm({ config, setConfig, hasApiKey, onApiKeyChange, defaultOutputDir, running, onStart }: Props) {
   const [apiKeyInput, setApiKeyInput] = useState("");
 
   function set<K extends keyof AppConfig>(key: K, value: AppConfig[K]) {
@@ -111,6 +112,37 @@ export default function ScrapeForm({ config, setConfig, hasApiKey, onApiKeyChang
                 onChange={(e) => setApiKeyInput(e.target.value)}
               />
               <button className="ghost" onClick={() => { onApiKeyChange(apiKeyInput); setApiKeyInput(""); }}>保存密钥</button>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>输出</legend>
+        <div className="row">
+          <div className="field" style={{ flex: 1 }}>
+            <label>保存路径</label>
+            <div className="row" style={{ margin: 0 }}>
+              <input
+                style={{ flex: 1 }}
+                placeholder={defaultOutputDir}
+                value={config.outputDir || ""}
+                onChange={(e) => set("outputDir", e.target.value)}
+                readOnly
+              />
+              <button
+                className="ghost"
+                disabled={running}
+                onClick={async () => {
+                  const dir = await window.vp.selectOutputDir();
+                  if (dir) set("outputDir", dir);
+                }}
+              >
+                浏览…
+              </button>
+              {config.outputDir && config.outputDir !== defaultOutputDir && (
+                <button className="ghost" onClick={() => set("outputDir", "")}>重置</button>
+              )}
             </div>
           </div>
         </div>

@@ -70,6 +70,7 @@ export default function App() {
             await window.vp.setApiKey(k);
             setHasApiKey(await window.vp.hasApiKey());
           }}
+          defaultOutputDir={outputDir}
           running={running}
           onStart={start}
         />

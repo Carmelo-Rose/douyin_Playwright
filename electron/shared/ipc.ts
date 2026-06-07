@@ -11,6 +11,7 @@ export const IPC = {
   settingsSet: "settings:set",
   secretGet: "secret:getApiKey",
   secretSet: "secret:setApiKey",
+  selectOutputDir: "settings:selectOutputDir",
   scrapeStart: "scrape:start",
   scrapeCancel: "scrape:cancel",
   scrapeLog: "scrape:log", // 主进程 → renderer 单向推送

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, safeStorage, shell } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, safeStorage, shell } from "electron";
 import { fork, type ChildProcess } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import path from "node:path";
@@ -85,6 +85,16 @@ function registerIpc(): void {
     return true;
   });
 
+  // —— 输出目录选择 ——
+  ipcMain.handle(IPC.selectOutputDir, async () => {
+    const result = await dialog.showOpenDialog({
+      title: "选择保存路径",
+      defaultPath: outputDir,
+      properties: ["openDirectory", "createDirectory"],
+    });
+    return result.canceled ? null : result.filePaths[0];
+  });
+
   // —— 密钥（safeStorage 加密，落 OS keychain）——
   ipcMain.handle(IPC.secretSet, (_e, key: string) => {
     if (!key) {
@@ -103,9 +113,18 @@ function registerIpc(): void {
     fs.mkdirSync(outputDir, { recursive: true });
 
     const runId = randomUUID();
-    const overrides = stripExcluded(config);
+    // 优先使用用户在设置页选择的路径，回退到默认 outputDir
+    const resolvedOutputDir = config.outputDir || outputDir;
+    fs.mkdirSync(resolvedOutputDir, { recursive: true });
+    // 把路径字段补回：子进程读 JSON 时这些字段不能为 undefined
+    const runnerConfig: AppConfig = {
+      ...config,
+      outputDir: resolvedOutputDir,
+      userDataDir: config.userDataDir || path.join(workDir, ".user-data", config.platform === "xhs" ? "xhs" : "douyin"),
+      dashscopeApiKey: "", // 密钥通过 env.DASHSCOPE_API_KEY 传递，JSON 里留空
+    };
     const tmpPath = path.join(os.tmpdir(), `vp-scrape-${runId}.json`);
-    await fsp.writeFile(tmpPath, JSON.stringify(overrides), "utf-8");
+    await fsp.writeFile(tmpPath, JSON.stringify(runnerConfig), "utf-8");
 
     const runnerPath = path.join(app.getAppPath(), "out/main/runner.js");
     const child = fork(runnerPath, ["--config", tmpPath], {

@@ -13,6 +13,7 @@ export interface VpApi {
   saveSettings(partial: Partial<AppConfig>): Promise<boolean>;
   setApiKey(key: string): Promise<boolean>;
   hasApiKey(): Promise<boolean>;
+  selectOutputDir(): Promise<string | null>;
   startScrape(config: AppConfig): Promise<ScrapeStartResult>;
   cancelScrape(runId: string): Promise<boolean>;
   onScrapeLog(cb: (e: ScrapeLogEvent) => void): () => void;
@@ -27,6 +28,7 @@ const api: VpApi = {
   saveSettings: (partial) => ipcRenderer.invoke(IPC.settingsSet, partial),
   setApiKey: (key) => ipcRenderer.invoke(IPC.secretSet, key),
   hasApiKey: () => ipcRenderer.invoke(IPC.secretGet),
+  selectOutputDir: () => ipcRenderer.invoke(IPC.selectOutputDir),
   startScrape: (config) => ipcRenderer.invoke(IPC.scrapeStart, config),
   cancelScrape: (runId) => ipcRenderer.invoke(IPC.scrapeCancel, runId),
   onScrapeLog: (cb) => {
