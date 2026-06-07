@@ -281,7 +281,7 @@ function registerIpc(): void {
 // ========================= ML 工作台 =========================
 
 const mlStore = new Store<{ settings: MlSettings }>({ name: "ml" });
-const DEFAULT_ML: MlSettings = { pythonPath: "", backbone: "siglip2-l", threshold: 0.5, maxNotes: 0, imgsPerNote: 2 };
+const DEFAULT_ML: MlSettings = { pythonPath: "", backbone: "clip-b32", threshold: 0.5, maxNotes: 0, imgsPerNote: 2 };
 const mlRunsDir = path.join(workDir, "ml-runs");
 const PREFIX_RE = /^(\d{1,3})_/; // predict 输出文件名前缀 087_xxx -> P(good)=0.87
 

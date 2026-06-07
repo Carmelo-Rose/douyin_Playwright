@@ -199,7 +199,7 @@ npm run start    # 生产模式（先打包再启动）
 
 打开后切到「ML 工作台」标签，工作流分五步：
 
-1. **① 运行环境**：检测 Python 与依赖、模型维度是否与当前 backbone 匹配。
+1. **① 运行环境**：检测 Python 与依赖、模型维度是否与当前 backbone 匹配。当前正式 backbone 为 `clip-b32`（512 维），系经同口径消融确定（SigLIP2 打平、美学分无增量，详见 [`ml/backbone_compare.md`](ml/backbone_compare.md)）。
 2. **② 待判断图片**：从抓取结果 xlsx 提取图片，或直接选本地文件夹。
 3. **③ 识图分拣**：调用 `ml/predict.py`，按 `P(good)` 阈值把图分拣到 `good/` 和 `bad/`。首次运行需加载模型权重，冷启动较慢。
 4. **④ 纠错**：人工复核分拣结果。每张缩略图：

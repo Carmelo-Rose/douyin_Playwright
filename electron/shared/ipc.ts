@@ -71,7 +71,7 @@ export interface ResultSheet {
 // —— ML 工作台 ——
 export interface MlSettings {
   pythonPath: string; // 空=自动探测 python3/python
-  backbone: string; // 默认 siglip2-l（与当前 1024 维模型一致）
+  backbone: string; // 默认 clip-b32（与当前 512 维线上模型一致；见 ml/backbone_compare.md）
   threshold: number; // 判 good 的概率阈值
   maxNotes: number; // xlsx 提取：前 N 条，0=全部
   imgsPerNote: number; // xlsx 提取：每条取前几张

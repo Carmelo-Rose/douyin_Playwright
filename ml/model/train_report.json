@@ -1,250 +1,370 @@
 {
   "samples_raw": 1756,
-  "samples_dedup": 1728,
-  "removed_near_duplicates": 28,
+  "samples_dedup": 1753,
+  "removed_near_duplicates": 3,
   "good_raw": 582,
   "bad_raw": 1174,
-  "good_dedup": 567,
-  "bad_dedup": 1161,
+  "good_dedup": 579,
+  "bad_dedup": 1174,
   "n_note_groups": 1484,
   "dedup": 0.95,
-  "backbone": "siglip2-l",
-  "feature_dim": 1024,
-  "cv_random_leak_acc": 0.831,
-  "cv_groupkfold_acc": 0.838,
-  "cv_acc": 0.838,
-  "cv_precision_good": 0.739,
-  "cv_recall_good": 0.783,
-  "cv_f1": 0.76,
+  "backbone": "clip-b32",
+  "feature_dim": 512,
+  "cv_random_leak_acc": 0.825,
+  "cv_groupkfold_acc": 0.823,
+  "cv_acc": 0.823,
+  "cv_precision_good": 0.724,
+  "cv_recall_good": 0.751,
+  "cv_f1": 0.737,
   "confusion": {
-    "TP": 444,
-    "TN": 1004,
-    "FP": 157,
-    "FN": 123
+    "TP": 435,
+    "TN": 1008,
+    "FP": 166,
+    "FN": 144
   },
-  "n_errors": 280,
+  "n_errors": 310,
   "errors": [
     {
       "path": "ml\\data\\labeled\\good\\00002.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.001
+      "prob_good": 0.0
     },
     {
       "path": "ml\\data\\labeled\\good\\00011.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.055
+      "prob_good": 0.039
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\00012.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.0
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\00033.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.039
     },
     {
       "path": "ml\\data\\labeled\\good\\00079.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.285
+      "prob_good": 0.237
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\00087.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.163
     },
     {
       "path": "ml\\data\\labeled\\good\\00089.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.062
+      "prob_good": 0.0
     },
     {
       "path": "ml\\data\\labeled\\good\\00096.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.294
+      "prob_good": 0.0
     },
     {
-      "path": "ml\\data\\labeled\\good\\00136.webp",
+      "path": "ml\\data\\labeled\\good\\00120.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.109
+      "prob_good": 0.1
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\00121.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.001
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\00122.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.21
     },
     {
       "path": "ml\\data\\labeled\\good\\00185.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.414
+      "prob_good": 0.316
     },
     {
-      "path": "ml\\data\\labeled\\good\\00198.webp",
+      "path": "ml\\data\\labeled\\good\\00194.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.002
+      "prob_good": 0.149
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\00204.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.0
     },
     {
       "path": "ml\\data\\labeled\\good\\00206.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.294
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\00209.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.007
+      "prob_good": 0.002
     },
     {
       "path": "ml\\data\\labeled\\good\\00210.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.008
+      "prob_good": 0.058
     },
     {
-      "path": "ml\\data\\labeled\\good\\00238.webp",
+      "path": "ml\\data\\labeled\\good\\00214.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.447
+      "prob_good": 0.028
     },
     {
       "path": "ml\\data\\labeled\\good\\00241.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.375
+      "prob_good": 0.145
     },
     {
-      "path": "ml\\data\\labeled\\good\\00382.webp",
+      "path": "ml\\data\\labeled\\good\\00444.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.033
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\00600.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.025
+      "prob_good": 0.0
     },
     {
       "path": "ml\\data\\labeled\\good\\00610.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.057
+      "prob_good": 0.005
     },
     {
-      "path": "ml\\data\\labeled\\good\\00614.webp",
+      "path": "ml\\data\\labeled\\good\\00702.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.45
+      "prob_good": 0.003
     },
     {
-      "path": "ml\\data\\labeled\\good\\00953.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.004
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\00955.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.03
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\01079.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.094
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\01171.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.036
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\01257.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.142
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\01374.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.413
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\01380.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.297
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\01422.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.001
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\01426.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.015
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\01428.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.056
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\01429.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.001
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\01483.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.436
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\01781.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.208
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\01905.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.421
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\01997.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.497
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\02092.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.261
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\02096.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.02
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\02101.webp",
+      "path": "ml\\data\\labeled\\good\\00709.webp",
       "true": "good",
       "pred": "bad",
       "prob_good": 0.002
     },
     {
+      "path": "ml\\data\\labeled\\good\\00884.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.027
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\00953.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.112
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\00955.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.033
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\00956.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.003
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\00960.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.444
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\01079.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.023
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\01171.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.015
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\01257.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.134
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\01338.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.061
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\01348.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.001
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\01362.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.07
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\01373.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.002
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\01426.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.0
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\01483.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.358
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\01674.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.003
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\01727.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.0
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\01779.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.425
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\01781.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.131
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\01893.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.0
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\01903.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.2
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\01997.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.06
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\02001.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.0
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\02002.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.001
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\02031.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.233
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\02032.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.023
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\02070.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.02
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\02073.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.035
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\02080.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.008
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\02094.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.486
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\02102.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.118
+    },
+    {
       "path": "ml\\data\\labeled\\good\\02117.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.419
+      "prob_good": 0.148
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\02147.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.08
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\02208.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.123
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\02209.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.154
     },
     {
       "path": "ml\\data\\labeled\\good\\02294.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.001
+      "prob_good": 0.005
     },
     {
       "path": "ml\\data\\labeled\\good\\02313.webp",
@@ -256,55 +376,49 @@
       "path": "ml\\data\\labeled\\good\\230.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.261
+      "prob_good": 0.447
     },
     {
       "path": "ml\\data\\labeled\\good\\314.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.073
+      "prob_good": 0.051
     },
     {
-      "path": "ml\\data\\labeled\\good\\700.webp",
+      "path": "ml\\data\\labeled\\good\\813.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.074
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row010_我最常戴的帽子合集3_03.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.0
+      "prob_good": 0.447
     },
     {
       "path": "ml\\data\\labeled\\good\\row018_img1.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.002
+      "prob_good": 0.001
     },
     {
       "path": "ml\\data\\labeled\\good\\row019_img2.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.094
+      "prob_good": 0.275
     },
     {
       "path": "ml\\data\\labeled\\good\\row022_img1.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.017
+      "prob_good": 0.079
     },
     {
       "path": "ml\\data\\labeled\\good\\row025_img4.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.002
+      "prob_good": 0.222
     },
     {
       "path": "ml\\data\\labeled\\good\\row029_img1.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.023
+      "prob_good": 0.062
     },
     {
       "path": "ml\\data\\labeled\\good\\row029_img2.webp",
@@ -316,241 +430,265 @@
       "path": "ml\\data\\labeled\\good\\row029_img3.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.165
+      "prob_good": 0.38
     },
     {
       "path": "ml\\data\\labeled\\good\\row029_img4.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.079
+      "prob_good": 0.027
     },
     {
       "path": "ml\\data\\labeled\\good\\row029_img5.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.002
+      "prob_good": 0.0
     },
     {
-      "path": "ml\\data\\labeled\\good\\row02_帽子衣服我给到夯_14.webp",
+      "path": "ml\\data\\labeled\\good\\row02_帽子衣服我给到夯_31.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.447
+      "prob_good": 0.183
     },
     {
       "path": "ml\\data\\labeled\\good\\row033_howto分享收藏已久帽子_01.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.0
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row033_howto分享收藏已久帽子_02.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.006
+      "prob_good": 0.439
     },
     {
       "path": "ml\\data\\labeled\\good\\row033_img1.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.05
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row036_我最常带的帽子合集2_03.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.002
+      "prob_good": 0.344
     },
     {
       "path": "ml\\data\\labeled\\good\\row036_我最常带的帽子合集2_06.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.001
+      "prob_good": 0.0
     },
     {
-      "path": "ml\\data\\labeled\\good\\row042_帽子合集៸៸៸៸੭ﾞ_01.webp",
+      "path": "ml\\data\\labeled\\good\\row041_img2.webp",
       "true": "good",
       "pred": "bad",
       "prob_good": 0.0
     },
     {
-      "path": "ml\\data\\labeled\\good\\row042_帽子合集៸៸៸៸੭ﾞ_03.webp",
+      "path": "ml\\data\\labeled\\good\\row042_帽子合集៸៸៸៸੭ﾞ_06.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.135
+      "prob_good": 0.015
     },
     {
-      "path": "ml\\data\\labeled\\good\\row045_韩系百搭的秋冬氛围感帽子来啦无广_05.webp",
+      "path": "ml\\data\\labeled\\good\\row045_韩系百搭的秋冬氛围感帽子来啦无广_02.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.053
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row046_Supreme帽子_04.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.05
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row051_img1.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.01
+      "prob_good": 0.044
     },
     {
       "path": "ml\\data\\labeled\\good\\row051_img2.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.002
+      "prob_good": 0.0
     },
     {
       "path": "ml\\data\\labeled\\good\\row051_img3.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.0
+      "prob_good": 0.001
     },
     {
       "path": "ml\\data\\labeled\\good\\row051_img4.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.0
+      "prob_good": 0.023
     },
     {
       "path": "ml\\data\\labeled\\good\\row051_img6.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.002
+      "prob_good": 0.0
     },
     {
       "path": "ml\\data\\labeled\\good\\row053_和我的帽子们一起拍证件照_03.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.102
+      "prob_good": 0.001
     },
     {
       "path": "ml\\data\\labeled\\good\\row054_img1.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.031
+      "prob_good": 0.392
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row066_tko帽子比衣服好看_03.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.056
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row06_扁头也终于体会到戴帽子好看的感觉了_01.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.0
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row071_ootd这顶帽子谁戴谁好看_04.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.039
     },
     {
       "path": "ml\\data\\labeled\\good\\row073_喜欢我的小帽子_01.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.123
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row075_img6.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.025
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row075_Jennie这物欲低得有点可怕了这帽子一_04.webp",
-      "true": "good",
-      "pred": "bad",
       "prob_good": 0.0
     },
     {
-      "path": "ml\\data\\labeled\\good\\row078_帽子分享戴这几顶时髦过夏天_02.webp",
+      "path": "ml\\data\\labeled\\good\\row075_img4.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.002
+      "prob_good": 0.325
     },
     {
-      "path": "ml\\data\\labeled\\good\\row07_总结一些好看帽子_02.webp",
+      "path": "ml\\data\\labeled\\good\\row075_Jennie这物欲低得有点可怕了这帽子一_05.webp",
       "true": "good",
       "pred": "bad",
       "prob_good": 0.0
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row07_总结一些好看帽子_03.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.087
     },
     {
       "path": "ml\\data\\labeled\\good\\row07_总结一些好看帽子_07.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.101
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row080_img5.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.45
+      "prob_good": 0.009
     },
     {
       "path": "ml\\data\\labeled\\good\\row085_年度盘点大头围喜欢戴的帽子合集_05.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.005
+      "prob_good": 0.001
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row096_img4.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.003
     },
     {
       "path": "ml\\data\\labeled\\good\\row09_帽子_01.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.0
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row10_什么才199强推这个帽子_03.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.082
+      "prob_good": 0.001
     },
     {
       "path": "ml\\data\\labeled\\good\\row120_img1.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.082
+      "prob_good": 0.025
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row126_早八人情侣党必入这顶帽子我锁死了_03.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.0
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row132_img2.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.008
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row135_img1.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.0
     },
     {
       "path": "ml\\data\\labeled\\good\\row13_巨显脸小显头小的渔夫帽修图我永远不发财_08.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.228
+      "prob_good": 0.058
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row13_巨显脸小显头小的渔夫帽修图我永远不发财_09.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.014
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row145_img1.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.027
     },
     {
       "path": "ml\\data\\labeled\\good\\row149_小众帽子合集6就喜欢买点不一样的_06.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.007
+      "prob_good": 0.065
     },
     {
       "path": "ml\\data\\labeled\\good\\row150_神仙帽子合集防晒显瘦还能美出圈_01.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.29
+      "prob_good": 0.167
     },
     {
-      "path": "ml\\data\\labeled\\good\\row154_谁能拒绝一顶会卖萌的帽子呢_04.webp",
+      "path": "ml\\data\\labeled\\good\\row153_Hollister这顶帽子怎么才被我发现_04.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.006
+      "prob_good": 0.029
     },
     {
-      "path": "ml\\data\\labeled\\good\\row155_会在家里搭帽子墙的人日常都在戴什么帽子_04.webp",
+      "path": "ml\\data\\labeled\\good\\row154_谁能拒绝一顶会卖萌的帽子呢_05.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.125
+      "prob_good": 0.128
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row155_会在家里搭帽子墙的人日常都在戴什么帽子_01.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.204
     },
     {
       "path": "ml\\data\\labeled\\good\\row156_摄影春夏帽子合集_06.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.007
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row157_太喜欢这顶帽子了_02.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.317
+      "prob_good": 0.306
     },
     {
       "path": "ml\\data\\labeled\\good\\row158_30别戴土帽子了这顶才显气质_01.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.328
+      "prob_good": 0.367
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row158_30别戴土帽子了这顶才显气质_03.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.38
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row15_藏蓝色棒球帽_22.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.0
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row15_藏蓝色棒球帽_23.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.488
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row160_img1.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.003
     },
     {
       "path": "ml\\data\\labeled\\good\\row160_img2.webp",
@@ -562,694 +700,670 @@
       "path": "ml\\data\\labeled\\good\\row160_img3.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.081
+      "prob_good": 0.0
     },
     {
       "path": "ml\\data\\labeled\\good\\row160_img4.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.011
+      "prob_good": 0.002
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row160_img5.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.444
     },
     {
       "path": "ml\\data\\labeled\\good\\row160_img6.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.022
+      "prob_good": 0.01
     },
     {
-      "path": "ml\\data\\labeled\\good\\row171_𐂂ONEMOMENT全员美丽的一期帽子搭_04.webp",
+      "path": "ml\\data\\labeled\\good\\row175_简单但很好戴的一顶帽子JOJOKUR_02.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.299
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row172_一顶黄帽子拯救所有平淡穿搭_05.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.001
+      "prob_good": 0.303
     },
     {
       "path": "ml\\data\\labeled\\good\\row177_at刚出预览逛了一圈看上了帽子燥候上新中_03.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.0
+      "prob_good": 0.002
     },
     {
       "path": "ml\\data\\labeled\\good\\row178_素人get到了显白大头帽子的真香_01.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.175
+      "prob_good": 0.133
     },
     {
-      "path": "ml\\data\\labeled\\good\\row186_这组AI帽子图已经可以直接上链接了_04.webp",
+      "path": "ml\\data\\labeled\\good\\row17_拿到波点帽了人也美了_05.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.09
+      "prob_good": 0.166
     },
     {
-      "path": "ml\\data\\labeled\\good\\row186_这组AI帽子图已经可以直接上链接了_06.webp",
+      "path": "ml\\data\\labeled\\good\\row180_在ins刷到的有没有人觉得这个帽子很可爱_03.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.022
+      "prob_good": 0.389
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row186_这组AI帽子图已经可以直接上链接了_05.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.0
     },
     {
       "path": "ml\\data\\labeled\\good\\row187_秋冬帽子大分享4大头大脸超友好_03.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.122
+      "prob_good": 0.005
     },
     {
-      "path": "ml\\data\\labeled\\good\\row189_img1.webp",
+      "path": "ml\\data\\labeled\\good\\row18_LV这个帽子还挺度假_03.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.0
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row190_我的帽子太出片啦_06.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.045
+      "prob_good": 0.008
     },
     {
       "path": "ml\\data\\labeled\\good\\row193_img1.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.076
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row193_img2.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.042
+      "prob_good": 0.034
     },
     {
       "path": "ml\\data\\labeled\\good\\row193_img3.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.09
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row193_img4.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.027
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row193_环球无牙仔帽子出租仅需20元园区门口取还_05.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.062
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row19_简直要被迪卡侬这个帽子萌晕了_02.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.086
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row210_img3.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.036
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row225_img1.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.11
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row234_img2.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.142
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row23_法式优雅千金感草帽_10.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.157
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row23_法式优雅千金感草帽_12.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.032
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row28_我爱的防晒帽合集来咯_06.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.131
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\row28_我爱的防晒帽合集来咯_08.webp",
-      "true": "good",
-      "pred": "bad",
       "prob_good": 0.497
     },
     {
-      "path": "ml\\data\\labeled\\good\\row34_又被override的帽子硬控了一个小时_10.webp",
+      "path": "ml\\data\\labeled\\good\\row193_环球无牙仔帽子出租仅需20元园区门口取还_06.webp",
       "true": "good",
       "pred": "bad",
-      "prob_good": 0.121
+      "prob_good": 0.135
     },
     {
-      "path": "ml\\data\\labeled\\good\\row34_又被override的帽子硬控了一个小时_11.webp",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.047
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\企业微信截图_17807317071446.png",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.0
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\企业微信截图_17807317679441.png",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.42
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\企业微信截图_1780731802806.png",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.0
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\企业微信截图_17807318328806.png",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.0
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\企业微信截图_17807318695896.png",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.09
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\企业微信截图_17807325992801.png",
-      "true": "good",
-      "pred": "bad",
-      "prob_good": 0.0
-    },
-    {
-      "path": "ml\\data\\labeled\\good\\企业微信截图_17807326693729.png",
+      "path": "ml\\data\\labeled\\good\\row197_买到了喜欢的帽子_01.webp",
       "true": "good",
       "pred": "bad",
       "prob_good": 0.001
     },
     {
+      "path": "ml\\data\\labeled\\good\\row197_买到了喜欢的帽子_02.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.0
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row20_睡醒下楼迅速拿下同款帽子_03.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.07
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row210_img3.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.015
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row21_法拉利摩纳哥帽子到手附弯折帽檐教程_01.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.0
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row225_img1.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.001
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row225_img3.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.001
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row234_img2.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.134
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row23_法式优雅千金感草帽_10.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.054
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row23_法式优雅千金感草帽_12.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.209
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\row26_帽子好搭档_07.webp",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.065
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\企业微信截图_17807316768222.png",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.444
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\企业微信截图_17807317071446.png",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.457
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\企业微信截图_1780731802806.png",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.037
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\企业微信截图_17807318119544.png",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.085
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\企业微信截图_17807318328806.png",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.167
+    },
+    {
+      "path": "ml\\data\\labeled\\good\\企业微信截图_17807323727966.png",
+      "true": "good",
+      "pred": "bad",
+      "prob_good": 0.044
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00004.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.783
+    },
+    {
       "path": "ml\\data\\labeled\\bad\\00015.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.964
+      "prob_good": 1.0
     },
     {
       "path": "ml\\data\\labeled\\bad\\00020.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.995
+      "prob_good": 0.776
     },
     {
-      "path": "ml\\data\\labeled\\bad\\00071.webp",
+      "path": "ml\\data\\labeled\\bad\\00021.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.597
+      "prob_good": 0.958
     },
     {
-      "path": "ml\\data\\labeled\\bad\\00094.webp",
+      "path": "ml\\data\\labeled\\bad\\00077.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.855
+      "prob_good": 0.963
     },
     {
-      "path": "ml\\data\\labeled\\bad\\00187.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 1.0
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00192.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.706
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00195.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 1.0
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00219.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.994
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00222.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.996
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00229.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.994
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00243.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.971
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00323.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.95
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00325.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.995
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00345.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.97
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00370.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.971
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00371.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.971
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00372.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.999
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00373.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.975
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00374.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.939
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00378.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 1.0
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00383.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.856
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00384.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.986
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00400.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.98
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00497.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.995
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00498.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.972
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00499.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.978
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00500.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.941
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00502.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.931
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00504.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.511
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00513.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.998
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00576.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.637
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00598.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.642
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00599.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 1.0
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00699.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.995
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00706.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.983
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00707.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.57
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00726.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.99
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00728.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.872
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00788.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.972
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00803.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.989
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00817.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.541
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00838.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.999
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00845.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.993
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00846.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.967
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00847.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.929
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00850.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.984
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00892.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.998
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00895.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.982
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00900.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.984
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00923.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.834
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00957.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.937
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00958.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.976
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00959.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.97
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00961.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.98
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\00962.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.704
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\01051.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.993
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\01052.webp",
+      "path": "ml\\data\\labeled\\bad\\00092.webp",
       "true": "bad",
       "pred": "good",
       "prob_good": 0.991
     },
     {
-      "path": "ml\\data\\labeled\\bad\\01053.webp",
+      "path": "ml\\data\\labeled\\bad\\00112.webp",
       "true": "bad",
       "pred": "good",
       "prob_good": 1.0
     },
     {
-      "path": "ml\\data\\labeled\\bad\\01098.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.97
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\01107.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.981
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\01108.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.967
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\01109.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.994
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\01110.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.996
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\01148.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.614
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\01168.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.998
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\01170.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.909
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\01215.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.947
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\01217.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.998
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\01256.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.897
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\01284.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.606
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\01343.webp",
+      "path": "ml\\data\\labeled\\bad\\00129.webp",
       "true": "bad",
       "pred": "good",
       "prob_good": 0.997
     },
     {
-      "path": "ml\\data\\labeled\\bad\\01344.webp",
+      "path": "ml\\data\\labeled\\bad\\00135.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.931
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00137.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.814
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00156.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.956
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00157.webp",
       "true": "bad",
       "pred": "good",
       "prob_good": 0.999
     },
     {
-      "path": "ml\\data\\labeled\\bad\\01346.webp",
+      "path": "ml\\data\\labeled\\bad\\00167.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.982
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00172.webp",
       "true": "bad",
       "pred": "good",
       "prob_good": 0.999
     },
     {
-      "path": "ml\\data\\labeled\\bad\\01364.webp",
+      "path": "ml\\data\\labeled\\bad\\00182.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.823
+      "prob_good": 0.997
     },
     {
-      "path": "ml\\data\\labeled\\bad\\01377.webp",
+      "path": "ml\\data\\labeled\\bad\\00195.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.869
+      "prob_good": 0.967
     },
     {
-      "path": "ml\\data\\labeled\\bad\\01378.webp",
+      "path": "ml\\data\\labeled\\bad\\00196.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.557
+      "prob_good": 0.935
     },
     {
-      "path": "ml\\data\\labeled\\bad\\01424.webp",
+      "path": "ml\\data\\labeled\\bad\\00199.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.913
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00216.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.997
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00219.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.996
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00222.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.93
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00229.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.997
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00243.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.94
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00244.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 1.0
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00325.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.939
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00333.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.955
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00345.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.99
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00370.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 1.0
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00371.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.965
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00372.webp",
       "true": "bad",
       "pred": "good",
       "prob_good": 0.995
     },
     {
-      "path": "ml\\data\\labeled\\bad\\01427.webp",
+      "path": "ml\\data\\labeled\\bad\\00373.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.995
+      "prob_good": 0.797
     },
     {
-      "path": "ml\\data\\labeled\\bad\\01580.webp",
+      "path": "ml\\data\\labeled\\bad\\00374.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.744
+      "prob_good": 0.932
     },
     {
-      "path": "ml\\data\\labeled\\bad\\01602.webp",
+      "path": "ml\\data\\labeled\\bad\\00381.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.895
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00384.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 1.0
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00392.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.501
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00400.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.957
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00497.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.783
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00498.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.906
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00499.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.999
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00500.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.954
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00504.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.707
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00513.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.988
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00598.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 1.0
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00613.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.946
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00701.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.711
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00707.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.999
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00788.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.95
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00803.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.935
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00845.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.978
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00846.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.999
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00847.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 1.0
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00850.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.964
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00893.webp",
       "true": "bad",
       "pred": "good",
       "prob_good": 0.96
     },
     {
-      "path": "ml\\data\\labeled\\bad\\01611.webp",
+      "path": "ml\\data\\labeled\\bad\\00896.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.6
+      "prob_good": 0.734
     },
     {
-      "path": "ml\\data\\labeled\\bad\\01636.webp",
+      "path": "ml\\data\\labeled\\bad\\00923.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.505
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00924.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.924
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00957.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.912
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00958.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.89
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00959.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.959
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\00961.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.984
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\01051.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.953
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\01052.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.939
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\01053.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.995
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\01098.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.993
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\01107.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.752
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\01108.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 1.0
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\01109.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.999
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\01110.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 1.0
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\01149.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.935
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\01150.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.963
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\01168.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 1.0
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\01215.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.886
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\01262.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 1.0
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\01343.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.975
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\01364.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.992
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\01375.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.97
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\01377.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.994
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\01520.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.998
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\01580.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 1.0
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\01615.webp",
       "true": "bad",
       "pred": "good",
       "prob_good": 1.0
@@ -1258,163 +1372,145 @@
       "path": "ml\\data\\labeled\\bad\\01704.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.749
+      "prob_good": 0.985
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\01724.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.82
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\01845.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.59
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\01857.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.991
     },
     {
       "path": "ml\\data\\labeled\\bad\\01858.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.679
+      "prob_good": 0.995
     },
     {
-      "path": "ml\\data\\labeled\\bad\\01898.webp",
+      "path": "ml\\data\\labeled\\bad\\01881.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.993
+      "prob_good": 1.0
     },
     {
-      "path": "ml\\data\\labeled\\bad\\01913.webp",
+      "path": "ml\\data\\labeled\\bad\\01897.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.716
+      "prob_good": 0.981
     },
     {
-      "path": "ml\\data\\labeled\\bad\\01939.webp",
+      "path": "ml\\data\\labeled\\bad\\01907.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.847
+      "prob_good": 0.684
     },
     {
-      "path": "ml\\data\\labeled\\bad\\01945.webp",
+      "path": "ml\\data\\labeled\\bad\\01990.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.909
+      "prob_good": 0.819
     },
     {
-      "path": "ml\\data\\labeled\\bad\\01981.webp",
+      "path": "ml\\data\\labeled\\bad\\01991.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.791
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\01992.webp",
       "true": "bad",
       "pred": "good",
       "prob_good": 0.998
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\01995.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.983
     },
     {
       "path": "ml\\data\\labeled\\bad\\01996.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.797
+      "prob_good": 0.914
     },
     {
       "path": "ml\\data\\labeled\\bad\\02006.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 1.0
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\02008.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.897
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\02009.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.999
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\02025.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.998
+      "prob_good": 0.645
     },
     {
       "path": "ml\\data\\labeled\\bad\\02033.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.999
+      "prob_good": 1.0
     },
     {
       "path": "ml\\data\\labeled\\bad\\02039.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.685
+      "prob_good": 0.618
     },
     {
-      "path": "ml\\data\\labeled\\bad\\02040.webp",
+      "path": "ml\\data\\labeled\\bad\\02041.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.976
+      "prob_good": 0.954
     },
     {
       "path": "ml\\data\\labeled\\bad\\02043.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 1.0
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\02044.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.996
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\02047.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.531
+      "prob_good": 0.707
     },
     {
       "path": "ml\\data\\labeled\\bad\\02068.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 1.0
+      "prob_good": 0.996
     },
     {
-      "path": "ml\\data\\labeled\\bad\\02100.webp",
+      "path": "ml\\data\\labeled\\bad\\02071.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 1.0
+      "prob_good": 0.928
     },
     {
-      "path": "ml\\data\\labeled\\bad\\02104.webp",
+      "path": "ml\\data\\labeled\\bad\\02072.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.514
+      "prob_good": 0.687
     },
     {
       "path": "ml\\data\\labeled\\bad\\02106.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.998
+      "prob_good": 1.0
     },
     {
-      "path": "ml\\data\\labeled\\bad\\02110.webp",
+      "path": "ml\\data\\labeled\\bad\\02107.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.883
+      "prob_good": 0.795
     },
     {
-      "path": "ml\\data\\labeled\\bad\\02146.webp",
+      "path": "ml\\data\\labeled\\bad\\02108.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.878
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\02163.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.535
+      "prob_good": 1.0
     },
     {
       "path": "ml\\data\\labeled\\bad\\02203.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 1.0
+      "prob_good": 0.994
     },
     {
       "path": "ml\\data\\labeled\\bad\\02207.webp",
@@ -1423,163 +1519,247 @@
       "prob_good": 1.0
     },
     {
-      "path": "ml\\data\\labeled\\bad\\02211.webp",
+      "path": "ml\\data\\labeled\\bad\\02230.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.959
+      "prob_good": 0.98
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\02241.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.52
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\02242.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.739
     },
     {
       "path": "ml\\data\\labeled\\bad\\02248.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.999
+      "prob_good": 0.62
     },
     {
-      "path": "ml\\data\\labeled\\bad\\02254.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.978
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row023_适合春天的帽子出现了_03.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.533
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row03_夏日citywalk刚需一款好帽子就够了_38.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 1.0
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row045_韩系百搭的秋冬氛围感帽子来啦无广_06.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.594
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row067_真发穿lo全靠帽子_05.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 1.0
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row068_img4.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.58
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row068_秋冬实用帽子合集大头友好版_01.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.808
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row068_秋冬实用帽子合集大头友好版_04.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.504
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row075_img5.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 1.0
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row080_img1.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.991
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row082_我以为没人记得了结果这帽子被问了一整年_02.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.904
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row090_怎么会有这么暖和的帽子和围巾附图解_03.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.99
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row091_长中庭菱形脸秋冬帽子怎么选_06.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.773
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row125_img4.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.541
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row125_焊在娃头上的半永久帽子这顶我能夸一夏天_03.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.952
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row12_久等了PonyUp帽子新色现已开售_08.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.977
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row12_久等了PonyUp帽子新色现已开售_30.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 1.0
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row155_会在家里搭帽子墙的人日常都在戴什么帽子_02.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 1.0
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row156_摄影春夏帽子合集_02.webp",
+      "path": "ml\\data\\labeled\\bad\\02277.webp",
       "true": "bad",
       "pred": "good",
       "prob_good": 0.997
     },
     {
-      "path": "ml\\data\\labeled\\bad\\row159_img1.webp",
+      "path": "ml\\data\\labeled\\bad\\02322.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.984
+      "prob_good": 0.819
     },
     {
-      "path": "ml\\data\\labeled\\bad\\row159_img3.webp",
+      "path": "ml\\data\\labeled\\bad\\02358.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.855
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\217.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.783
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\532.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.723
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row005_有人喜欢我设计的轻樱花帽子吗右滑_02.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.597
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row006_帽子合集_01.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.957
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row034_戴帽子才有的氛围感_05.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.995
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row03_夏日citywalk刚需一款好帽子就够了_38.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.982
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row041_织女喜欢戴帽子_03.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.956
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row045_韩系百搭的秋冬氛围感帽子来啦无广_06.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.979
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row04_帽子我的帽子_01.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.938
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row070_img4.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.893
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row075_Jennie这物欲低得有点可怕了这帽子一_02.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.915
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row080_img1.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.861
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row080_img4.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.946
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row085_年度盘点大头围喜欢戴的帽子合集_06.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 1.0
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row091_长中庭菱形脸秋冬帽子怎么选_06.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.997
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row119_img1.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.987
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row120_Allin吧拉夫劳伦的帽子不做选择_05.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.721
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row122_img5.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.691
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row125_img1.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.994
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row125_焊在娃头上的半永久帽子这顶我能夸一夏天_04.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.997
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row12_久等了PonyUp帽子新色现已开售_13.webp",
       "true": "bad",
       "pred": "good",
       "prob_good": 0.953
     },
     {
-      "path": "ml\\data\\labeled\\bad\\row163_深圳有选帽困难症的朋友推荐来这里买帽子_03.webp",
+      "path": "ml\\data\\labeled\\bad\\row12_久等了PonyUp帽子新色现已开售_30.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.988
+      "prob_good": 0.686
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row12_久等了PonyUp帽子新色现已开售_50.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.947
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row140_TCH帽子上新_03.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.91
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row155_会在家里搭帽子墙的人日常都在戴什么帽子_03.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.991
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row159_img3.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.634
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row160_好蜜们快来帮我选帽子_05.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.948
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row160_好蜜们快来帮我选帽子_06.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.967
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row165_戴上帽子一下子就高级了_02.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.966
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row16_宅女秋鱼同款帽子搭拉夫衬衫好适配谁懂_37.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.509
     },
     {
       "path": "ml\\data\\labeled\\bad\\row16_宅女秋鱼同款帽子搭拉夫衬衫好适配谁懂_38.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.623
+      "prob_good": 0.749
     },
     {
-      "path": "ml\\data\\labeled\\bad\\row187_img3.webp",
+      "path": "ml\\data\\labeled\\bad\\row173_户外帽子大分享_02.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.976
+      "prob_good": 0.991
     },
     {
-      "path": "ml\\data\\labeled\\bad\\row187_秋冬帽子大分享4大头大脸超友好_05.webp",
+      "path": "ml\\data\\labeled\\bad\\row173_户外帽子大分享_04.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.994
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row185_颜值与防晒并存的帽子_04.webp",
       "true": "bad",
       "pred": "good",
       "prob_good": 1.0
@@ -1588,121 +1768,121 @@
       "path": "ml\\data\\labeled\\bad\\row190_我的帽子太出片啦_03.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.988
+      "prob_good": 0.911
     },
     {
-      "path": "ml\\data\\labeled\\bad\\row193_环球无牙仔帽子出租仅需20元园区门口取还_01.webp",
+      "path": "ml\\data\\labeled\\bad\\row193_环球无牙仔帽子出租仅需20元园区门口取还_03.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.981
+      "prob_good": 0.875
     },
     {
-      "path": "ml\\data\\labeled\\bad\\row197_img3.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.961
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row203_img5.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.614
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row210_img2.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.909
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row27_条纹防晒帽_03.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.94
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row30_今天通勤戴obsu交叉帽_32.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.728
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row30_今天通勤戴obsu交叉帽_33.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.542
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row33_好喜欢我的帽子出片和防晒我都要_21.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.984
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row33_好喜欢我的帽子出片和防晒我都要_23.webp",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.953
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\row36_美式帽子推荐_14.webp",
+      "path": "ml\\data\\labeled\\bad\\row193_环球无牙仔帽子出租仅需20元园区门口取还_04.webp",
       "true": "bad",
       "pred": "good",
       "prob_good": 0.994
     },
     {
-      "path": "ml\\data\\labeled\\bad\\row39_inspo就喜欢这种松弛感_04.webp",
+      "path": "ml\\data\\labeled\\bad\\row204_img1.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.778
+      "prob_good": 0.935
     },
     {
-      "path": "ml\\data\\labeled\\bad\\row39_inspo就喜欢这种松弛感_05.webp",
+      "path": "ml\\data\\labeled\\bad\\row204_img2.webp",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.565
+      "prob_good": 0.963
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row235_img2.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.998
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row27_条纹防晒帽_03.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.527
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row30_今天通勤戴obsu交叉帽_28.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.925
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row30_今天通勤戴obsu交叉帽_31.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.988
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row30_今天通勤戴obsu交叉帽_32.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.648
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row33_好喜欢我的帽子出片和防晒我都要_21.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.68
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row33_好喜欢我的帽子出片和防晒我都要_23.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.668
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\row36_美式帽子推荐_14.webp",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.999
     },
     {
       "path": "ml\\data\\labeled\\bad\\企业微信截图_17807316473375.png",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.998
-    },
-    {
-      "path": "ml\\data\\labeled\\bad\\企业微信截图_17807326226846.png",
-      "true": "bad",
-      "pred": "good",
-      "prob_good": 0.855
+      "prob_good": 0.989
     },
     {
       "path": "ml\\data\\labeled\\bad\\企业微信截图_17807327237433.png",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.843
+      "prob_good": 0.996
     },
     {
       "path": "ml\\data\\labeled\\bad\\企业微信截图_17807328855549.png",
       "true": "bad",
       "pred": "good",
-      "prob_good": 1.0
+      "prob_good": 0.901
     },
     {
       "path": "ml\\data\\labeled\\bad\\企业微信截图_17807330086416.png",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.998
+      "prob_good": 1.0
     },
     {
       "path": "ml\\data\\labeled\\bad\\企业微信截图_17807330404349.png",
       "true": "bad",
       "pred": "good",
-      "prob_good": 1.0
+      "prob_good": 0.996
+    },
+    {
+      "path": "ml\\data\\labeled\\bad\\企业微信截图_17807331391486.png",
+      "true": "bad",
+      "pred": "good",
+      "prob_good": 0.951
     },
     {
       "path": "ml\\data\\labeled\\bad\\企业微信截图_17807332716140.png",
       "true": "bad",
       "pred": "good",
-      "prob_good": 0.96
+      "prob_good": 0.999
     }
   ]
 }

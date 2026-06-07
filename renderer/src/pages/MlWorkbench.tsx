@@ -257,9 +257,9 @@ export default function MlWorkbench() {
           </div>
           <div className="field">
             <label>backbone</label>
-            <select value={settings?.backbone ?? "siglip2-l"} onChange={(e) => patchSettings({ backbone: e.target.value })}>
-              <option value="siglip2-l">siglip2-l（1024，当前模型）</option>
-              <option value="clip-b32">clip-b32（512，旧）</option>
+            <select value={settings?.backbone ?? "clip-b32"} onChange={(e) => patchSettings({ backbone: e.target.value })}>
+              <option value="clip-b32">clip-b32（512，当前模型）</option>
+              <option value="siglip2-l">siglip2-l（1024，消融打平、未采用）</option>
               <option value="dinov2-l">dinov2-l（1024）</option>
               <option value="siglip2-l+dinov2-l">siglip2-l+dinov2-l（2048）</option>
             </select>

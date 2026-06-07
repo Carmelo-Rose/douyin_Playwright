@@ -10,6 +10,7 @@ social-monitor/.state/
 
 .venv/
 
-# ML 训练/安装日志、Windows 误建的 nul 设备文件
+# ML 训练/安装日志、临时驱动脚本、Windows 误建的 nul 设备文件
 ml/*.log
+ml/_*.sh
 nul
