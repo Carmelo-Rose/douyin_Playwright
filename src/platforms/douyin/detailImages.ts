@@ -39,7 +39,7 @@ export async function enrichDouyinDetailImages(
 
   for (let index = 0; index < videos.length; index += 1) {
     const video = videos[index];
-    if (video.imageUrls.length > 0) {
+    if (video.imageUrls.length >= config.detailImageLimit) {
       video.imageUrls = mergeImageUrls(video.imageUrls, "").slice(0, config.detailImageLimit);
       video.detailImageStatus = `搜索接口图文图片（${video.imageUrls.length}张）`;
       continue;
@@ -64,7 +64,7 @@ export async function enrichDouyinDetailImages(
     }
 
     if (result.imageUrls.length > 0) {
-      video.imageUrls = mergeImageUrls(result.imageUrls, "").slice(0, config.detailImageLimit);
+      video.imageUrls = mergeImageUrls([...video.imageUrls, ...result.imageUrls], "").slice(0, config.detailImageLimit);
       video.detailImageStatus = `详情补图成功（${video.imageUrls.length}张）`;
     } else {
       markFallbackImages(video, result.status || "详情未发现多图，使用封面");
@@ -259,7 +259,6 @@ function mergeImageUrls(urls: string[], coverUrl: string): string[] {
 }
 
 function markFallbackImages(video: VideoRecord, status: string): VideoRecord {
-  video.imageUrls = [];
   video.detailImageStatus = video.detailImageStatus || status;
   return video;
 }

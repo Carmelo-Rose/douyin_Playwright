@@ -34,11 +34,13 @@ from sklearn.model_selection import (
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
-from clip_utils import embed_image
+from clip_utils import embed_image, feature_tag
 
 ROOT = Path(__file__).resolve().parent.parent
 LABELED_DIR = ROOT / "ml" / "data" / "labeled"
-CACHE_PATH = ROOT / "ml" / "cache" / "embed_cache.npz"
+# 缓存文件按 backbone 隔离，彻底避免不同维度特征混进同一个 npz（512 vs 1024）
+_CACHE_TAG = feature_tag().replace("+", "_").replace("/", "_")
+CACHE_PATH = ROOT / "ml" / "cache" / f"embed_cache_{_CACHE_TAG}.npz"
 MODEL_DIR = ROOT / "ml" / "model"
 EXTS = {".png", ".jpg", ".jpeg", ".webp", ".gif"}
 DEDUP_COSINE = 0.95  # 同组内特征余弦 >= 此值视为近似重复图
@@ -98,7 +100,9 @@ def load_cache():
 def save_cache(cache: dict):
     CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
     keys = np.array(list(cache.keys()), dtype=object)
-    vecs = np.stack(list(cache.values()), axis=0) if cache else np.zeros((0, 512))
+    # 维度动态推断（换 backbone 后特征维度会变，不能硬编码 512）
+    dim = next(iter(cache.values())).shape[0] if cache else 1
+    vecs = np.stack(list(cache.values()), axis=0) if cache else np.zeros((0, dim))
     np.savez(CACHE_PATH, keys=keys, vecs=vecs)
 
 
@@ -107,7 +111,8 @@ def build_features(samples):
     X, y, paths, groups = [], [], [], []
     new = 0
     for i, (path, label) in enumerate(samples, 1):
-        key = file_key(path)
+        # 缓存键加 backbone 前缀，换 backbone 自动失效旧缓存（避免读到错维度向量）
+        key = f"{feature_tag()}:{file_key(path)}"
         if key in cache:
             vec = cache[key]
         else:
