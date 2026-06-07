@@ -7,3 +7,5 @@ output/
 .env
 .DS_Store
 social-monitor/.state/
+
+.venv/
