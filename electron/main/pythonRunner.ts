@@ -2,6 +2,9 @@
  * 跨平台 Python 定位与环境检测（替代 Windows 专用的 ml/run.ps1）。
  */
 import { execFile } from "node:child_process";
+import { existsSync } from "node:fs";
+import path from "node:path";
+import process from "node:process";
 import { promisify } from "node:util";
 
 const pexec = promisify(execFile);
@@ -21,36 +24,80 @@ export function backboneDim(backbone: string): number {
     .reduce((a, b) => a + b, 0);
 }
 
-/** 解析要用的 python 可执行：优先用户配置，回退到能 import open_clip 的解释器。 */
+const IS_WIN = process.platform === "win32";
+
+/**
+ * 推导 Accio 内置 Python 路径。
+ * Accio 把 node/python 放在同级目录：.../pre-install/<hash>/node/node(.exe) 与 .../python/python(.exe)。
+ * 通过环境变量 ACCIO_NODE_BIN 拿到 node 路径，回溯到 pre-install 根再拼出 python。
+ * 这条候选不依赖 PATH，可解决"内置 python 不在 PATH 首位/不在 PATH"的问题。
+ */
+function builtinPythonCandidates(): string[] {
+  const out: string[] = [];
+  const exe = IS_WIN ? "python.exe" : "python3";
+  const exeAlt = IS_WIN ? "python3.exe" : "python";
+
+  // ACCIO_NODE_BIN: .../pre-install/<hash>/node/node(.exe) → 同级 python 目录
+  const nodeBin = process.env.ACCIO_NODE_BIN?.trim();
+  if (nodeBin) {
+    const preInstallRoot = path.dirname(path.dirname(nodeBin)); // 去掉 node/node.exe 两层
+    for (const name of [exe, exeAlt]) {
+      out.push(path.join(preInstallRoot, "python", name));
+    }
+  }
+  return out.filter((p) => existsSync(p));
+}
+
+/** 跨平台枚举 PATH 上的 python（Windows: where；其余: which -a）。去重。 */
+async function listPathPythons(): Promise<string[]> {
+  const finder = IS_WIN ? "where" : "which";
+  const names = IS_WIN ? ["python.exe", "python3.exe"] : ["python3", "python"];
+  const out = new Set<string>();
+  for (const name of names) {
+    try {
+      const args = IS_WIN ? [name] : ["-a", name];
+      const { stdout } = await pexec(finder, args, { timeout: 5_000 });
+      for (const line of stdout.split(/\r?\n/).map((l) => l.trim()).filter(Boolean)) {
+        out.add(line);
+      }
+    } catch {
+      // finder 找不到该名字就跳过
+    }
+  }
+  return [...out];
+}
+
+let cachedPython: string | undefined;
+
+/** 解析要用的 python 可执行：优先用户配置，回退到能 import open_clip 的解释器（结果缓存）。 */
 export async function resolvePython(configured: string): Promise<string> {
   const fixed = configured?.trim();
   if (fixed) return fixed;
 
-  // 收集所有候选：先枚举 PATH 里的 python，再加 Windows 常见安装路径
-  const candidates: string[] = [];
-  for (const name of ["python3", "python"]) {
-    try {
-      const { stdout } = await pexec("where", [name], { timeout: 5_000 });
-      for (const line of stdout.split(/\r?\n/).map((l) => l.trim()).filter(Boolean)) {
-        candidates.push(line);
-      }
-    } catch {
-      // where 找不到就跳过
-    }
-  }
+  if (cachedPython) return cachedPython;
+
+  // 候选顺序：内置 python（不在 PATH 也能命中） → PATH 上的 python，整体去重
+  const ordered = [...builtinPythonCandidates(), ...(await listPathPythons())];
+  const candidates = [...new Set(ordered)];
 
   // 优先找能 import open_clip 的解释器
   for (const cand of candidates) {
     try {
-      await pexec(cand, ["-c", "import open_clip"], { timeout: 10_000 });
+      await pexec(cand, ["-c", "import open_clip"], { timeout: 15_000 });
+      cachedPython = cand;
       return cand;
     } catch {
       // 继续尝试下一个
     }
   }
 
-  // 没找到 open_clip 时回退第一个可用的
-  return candidates[0] ?? "python3";
+  // 没找到 open_clip 时回退第一个可用候选（不缓存：留待依赖装好后重试能重新命中）
+  return candidates[0] ?? (IS_WIN ? "python" : "python3");
+}
+
+/** 清除已缓存的 python 解析结果（装完依赖或用户改配置后调用，强制下次重新探测）。 */
+export function clearPythonCache(): void {
+  cachedPython = undefined;
 }
 
 const DETECT_SNIPPET = `

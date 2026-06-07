@@ -10,7 +10,7 @@ import ExcelJS from "exceljs";
 import Store from "electron-store";
 import { resolveConfig, type AppConfig } from "../../src/config.js";
 import { cancelJob, killAllJobs, runJob } from "./jobRunner.js";
-import { backboneDim, probePython, resolvePython } from "./pythonRunner.js";
+import { backboneDim, clearPythonCache, probePython, resolvePython } from "./pythonRunner.js";
 import {
   IPC,
   type MlEnvReport,
@@ -330,10 +330,13 @@ function registerMlIpc(): void {
   ipcMain.handle(IPC.mlGetSettings, () => getMlSettings());
   ipcMain.handle(IPC.mlSetSettings, (_e, partial: Partial<MlSettings>) => {
     mlStore.set("settings", { ...getMlSettings(), ...partial });
+    if ("pythonPath" in partial) clearPythonCache(); // 路径变了，作废自动探测缓存
     return true;
   });
 
   ipcMain.handle(IPC.mlDetectEnv, async (): Promise<MlEnvReport> => {
+    // 用户主动点"检测环境"：清缓存强制重新探测（依赖可能刚装好/路径刚改）
+    clearPythonCache();
     const s = getMlSettings();
     const python = await resolvePython(s.pythonPath);
     const probe = await probePython(python, projectRoot(), mlEnv(s));
