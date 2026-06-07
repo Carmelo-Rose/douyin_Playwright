@@ -11,6 +11,7 @@
     "probe:deep": "tsx src/playCountDeepProbe.ts",
     "typecheck": "tsc --noEmit",
     "build": "tsc",
+    "start": "electron-vite build && electron .",
     "dev": "electron-vite dev",
     "build:app": "electron-vite build",
     "preview": "electron-vite preview",

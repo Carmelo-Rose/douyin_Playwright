@@ -21,19 +21,36 @@ export function backboneDim(backbone: string): number {
     .reduce((a, b) => a + b, 0);
 }
 
-/** 解析要用的 python 可执行：优先用户配置，回退 python3 / python。 */
+/** 解析要用的 python 可执行：优先用户配置，回退到能 import open_clip 的解释器。 */
 export async function resolvePython(configured: string): Promise<string> {
   const fixed = configured?.trim();
   if (fixed) return fixed;
-  for (const cand of ["python3", "python"]) {
+
+  // 收集所有候选：先枚举 PATH 里的 python，再加 Windows 常见安装路径
+  const candidates: string[] = [];
+  for (const name of ["python3", "python"]) {
     try {
-      await pexec(cand, ["--version"]);
-      return cand;
+      const { stdout } = await pexec("where", [name], { timeout: 5_000 });
+      for (const line of stdout.split(/\r?\n/).map((l) => l.trim()).filter(Boolean)) {
+        candidates.push(line);
+      }
     } catch {
-      // try next
+      // where 找不到就跳过
     }
   }
-  return "python3";
+
+  // 优先找能 import open_clip 的解释器
+  for (const cand of candidates) {
+    try {
+      await pexec(cand, ["-c", "import open_clip"], { timeout: 10_000 });
+      return cand;
+    } catch {
+      // 继续尝试下一个
+    }
+  }
+
+  // 没找到 open_clip 时回退第一个可用的
+  return candidates[0] ?? "python3";
 }
 
 const DETECT_SNIPPET = `
