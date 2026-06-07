@@ -54,7 +54,30 @@ interface LoadConfigOptions {
 const DEFAULT_USER_AGENT =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
 
+/**
+ * 现有 CLI 入口使用：默认 ← .env ← 命令行 flag。行为保持不变。
+ */
 export function loadConfig(options: LoadConfigOptions = {}): AppConfig {
+  return resolveConfig(undefined, options);
+}
+
+/**
+ * 桌面客户端使用：在 loadConfig 的结果之上叠加 UI 传入的覆盖值（最高优先级）。
+ * 路径类字段（outputDir/userDataDir 等）若由 UI 传入绝对路径，会直接生效。
+ */
+export function resolveConfig(overrides?: Partial<AppConfig>, options: LoadConfigOptions = {}): AppConfig {
+  const base = buildBaseConfig(options);
+  return overrides ? { ...base, ...overrides } : base;
+}
+
+/**
+ * 桌面客户端使用：给设置表单提供一份初值。
+ */
+export function defaultConfig(options: LoadConfigOptions = {}): AppConfig {
+  return buildBaseConfig(options);
+}
+
+function buildBaseConfig(options: LoadConfigOptions = {}): AppConfig {
   const platform = parsePlatform(readCliValue("--platform") || process.env.PLATFORM, options.defaultPlatform ?? "all");
   const cliKeyword = readCliValue("--keyword");
   const keyword = cliKeyword || process.env.KEYWORD || "帽子";

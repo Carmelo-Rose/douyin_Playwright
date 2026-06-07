@@ -2,7 +2,7 @@
   "name": "douyin_playwright",
   "version": "1.0.0",
   "description": "Local Playwright demo for capturing Douyin mall search product data.",
-  "main": "dist/index.js",
+  "main": "out/main/index.js",
   "scripts": {
     "capture": "tsx src/index.ts",
     "score:xhs-workbook": "tsx src/platforms/xhs/scoreWorkbook.ts",
@@ -10,7 +10,11 @@
     "probe:play-count": "tsx src/playCountProbe.ts",
     "probe:deep": "tsx src/playCountDeepProbe.ts",
     "typecheck": "tsc --noEmit",
-    "build": "tsc"
+    "build": "tsc",
+    "dev": "electron-vite dev",
+    "build:app": "electron-vite build",
+    "preview": "electron-vite preview",
+    "dist": "electron-vite build && electron-builder"
   },
   "keywords": [],
   "author": "",
@@ -18,16 +22,44 @@
   "type": "module",
   "dependencies": {
     "dotenv": "^17.4.2",
+    "electron-store": "^10.0.0",
     "exceljs": "^4.4.0",
     "fs-extra": "^11.3.5",
     "playwright": "^1.60.0",
     "playwright-extra": "^4.3.6",
-    "puppeteer-extra-plugin-stealth": "^2.11.2"
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^25.8.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8",
+    "electron-vite": "^2.3.0",
     "tsx": "^4.22.1",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vite": "^5.4.11"
+  },
+  "build": {
+    "appId": "com.local.visualpipeline",
+    "productName": "Visual Pipeline",
+    "files": [
+      "out/**/*",
+      "src/**/*",
+      "node_modules/**/*"
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis"
+    }
   }
 }
