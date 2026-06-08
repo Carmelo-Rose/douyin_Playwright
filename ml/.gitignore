@@ -15,3 +15,8 @@ data/labeled/
 !model/
 !model/aesthetic_clf.joblib
 !model/train_report.json
+# 预测输入/输出图片（可由脚本重新生成，二进制太大不入库）
+data/to_predict/**/*.webp
+data/result_*/**/*.webp
+data/fp_clusters/**/*.webp
+data/self_consistency/**/*.webp
