@@ -231,7 +231,8 @@ async function runPredict(scriptPath: string, inputDir: string, config: AppConfi
   return new Promise<PredictPayload>((resolve, reject) => {
     const child = spawn(config.visualClassifierPython, args, {
       cwd: path.dirname(path.dirname(scriptPath)), // 项目根（ml 的上一级）
-      env: process.env,
+      // 强制 Python stdout/stderr 用 UTF-8，避免 Windows 默认 GBK 输出与 Node 的 utf8 解码错位导致 JSON.parse 崩。
+      env: { ...process.env, PYTHONIOENCODING: "utf-8" },
     });
 
     let stdout = "";
