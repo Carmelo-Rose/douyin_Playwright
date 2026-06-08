@@ -20,6 +20,7 @@
 """
 import argparse
 import csv
+import json
 import shutil
 import sys
 from pathlib import Path
@@ -54,10 +55,16 @@ def main():
     ap.add_argument("--threshold", type=float, default=0.5, help="判 good 的概率阈值，默认0.5")
     ap.add_argument("--csv", default="", help="可选：导出结果到 csv")
     ap.add_argument("--sort-to", default="", help="可选：把图按判断结果复制到 <目录>/good 和 <目录>/bad")
+    ap.add_argument("--json", action="store_true", help="机器可读模式：仅在 stdout 打印一行 JSON（供 Node 桥接解析），其余日志走 stderr")
     args = ap.parse_args()
 
+    # --json 模式下，把人类可读日志全部转到 stderr，stdout 只留最终 JSON 一行
+    log = (lambda *a, **k: print(*a, file=sys.stderr, **k)) if args.json else print
+
     if not MODEL_PATH.exists():
-        print(f"[err] 模型不存在，请先训练：python ml/train_singleimage.py")
+        log(f"[err] 模型不存在，请先训练：python ml/train_singleimage.py")
+        if args.json:
+            print(json.dumps({"error": "model_not_found", "model": str(MODEL_PATH), "results": []}, ensure_ascii=False))
         sys.exit(1)
 
     input_path = Path(args.input)
@@ -65,12 +72,14 @@ def main():
         input_path = Path.cwd() / input_path
     images = collect_images(input_path)
     if not images:
-        print(f"[err] 没找到图片: {input_path}")
+        log(f"[err] 没找到图片: {input_path}")
+        if args.json:
+            print(json.dumps({"error": "no_images", "input": str(input_path), "results": []}, ensure_ascii=False))
         sys.exit(1)
 
-    print(f"[info] 加载模型 {MODEL_PATH.name}")
+    log(f"[info] 加载模型 {MODEL_PATH.name}")
     model = joblib.load(MODEL_PATH)
-    print(f"[info] 预测 {len(images)} 张图片 (阈值={args.threshold})...\n")
+    log(f"[info] 预测 {len(images)} 张图片 (阈值={args.threshold})...\n")
 
     rows = []
     for i, p in enumerate(images, 1):
@@ -78,21 +87,34 @@ def main():
             vec = embed_image(p).reshape(1, -1)
             prob_good = float(model.predict_proba(vec)[0, 1])
         except Exception as e:
-            print(f"[warn] 跳过 {p.name}: {e}")
+            log(f"[warn] 跳过 {p.name}: {e}")
             continue
         verdict = "good" if prob_good >= args.threshold else "bad"
         rows.append((p.name, verdict, prob_good, str(p)))
         if i % 25 == 0:
-            print(f"  [进度] {i}/{len(images)}")
+            log(f"  [进度] {i}/{len(images)}")
 
     # 按 P(good) 降序：最像好图的排最前
     rows.sort(key=lambda r: r[2], reverse=True)
 
     n_good = sum(1 for r in rows if r[1] == "good")
-    print(f"\n=== 预测结果 (good={n_good}, bad={len(rows)-n_good}) ===")
+    log(f"\n=== 预测结果 (good={n_good}, bad={len(rows)-n_good}) ===")
     for name, verdict, prob, _ in rows:
         mark = "[GOOD]" if verdict == "good" else "[BAD] "
-        print(f"{mark} P(good)={prob:.2f}  {name[:50]}")
+        log(f"{mark} P(good)={prob:.2f}  {name[:50]}")
+
+    if args.json:
+        payload = {
+            "error": None,
+            "threshold": args.threshold,
+            "good": n_good,
+            "bad": len(rows) - n_good,
+            "results": [
+                {"name": name, "path": full, "verdict": verdict, "prob_good": round(prob, 6)}
+                for name, verdict, prob, full in rows
+            ],
+        }
+        print(json.dumps(payload, ensure_ascii=False))
 
     if args.csv:
         csv_path = Path(args.csv)
@@ -101,7 +123,7 @@ def main():
             w.writerow(["文件名", "预测", "P(good)", "路径"])
             for name, verdict, prob, full in rows:
                 w.writerow([name, verdict, f"{prob:.4f}", full])
-        print(f"\n[done] 已导出 -> {csv_path}")
+        log(f"\n[done] 已导出 -> {csv_path}")
 
     if args.sort_to:
         sort_dir = Path(args.sort_to)
@@ -121,10 +143,10 @@ def main():
                 shutil.copy2(full, dest_dir / dest_name)
                 copied += 1
             except Exception as e:
-                print(f"[warn] 复制失败 {name}: {e}")
-        print(f"\n[done] 已分拣 {copied} 张 -> {sort_dir}")
-        print(f"       good/ ({n_good} 张)  bad/ ({len(rows)-n_good} 张)")
-        print(f"       文件名前缀=P(good)百分比，文件夹内可按名称排序看最像/最不像")
+                log(f"[warn] 复制失败 {name}: {e}")
+        log(f"\n[done] 已分拣 {copied} 张 -> {sort_dir}")
+        log(f"       good/ ({n_good} 张)  bad/ ({len(rows)-n_good} 张)")
+        log(f"       文件名前缀=P(good)百分比，文件夹内可按名称排序看最像/最不像")
 
 
 if __name__ == "__main__":

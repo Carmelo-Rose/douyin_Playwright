@@ -40,6 +40,14 @@ export interface AppConfig {
   dashscopeApiKey: string;
   dashscopeBaseUrl: string;
   dashscopeModel: string;
+  visualClassifierEnabled: boolean;
+  visualClassifierPython: string;
+  visualClassifierScript: string;
+  visualClassifierThreshold: number;
+  visualClassifierMaxImages: number;
+  visualClassifierMaxItems: number;
+  visualClassifierConcurrency: number;
+  visualClassifierTimeoutMs: number;
   userAgent: string;
   browserChannel: string;
   humanLike: boolean;
@@ -126,6 +134,36 @@ function buildBaseConfig(options: LoadConfigOptions = {}): AppConfig {
     dashscopeApiKey: process.env.DASHSCOPE_API_KEY?.trim() || "",
     dashscopeBaseUrl: (process.env.DASHSCOPE_BASE_URL || "https://dashscope.aliyuncs.com/compatible-mode/v1").trim(),
     dashscopeModel: (process.env.DASHSCOPE_MODEL || "qwen3-vl-flash").trim(),
+    visualClassifierEnabled: parseBoolean(
+      readCliValue("--visual-classifier") || process.env.VISUAL_CLASSIFIER,
+      true,
+    ),
+    visualClassifierPython: (
+      readCliValue("--visual-classifier-python") || process.env.VISUAL_CLASSIFIER_PYTHON || "python"
+    ).trim(),
+    visualClassifierScript: resolveFromCwd(
+      readCliValue("--visual-classifier-script") || process.env.VISUAL_CLASSIFIER_SCRIPT || "ml/predict.py",
+    ),
+    visualClassifierThreshold: parseFloatOption(
+      readCliValue("--visual-classifier-threshold") || process.env.VISUAL_CLASSIFIER_THRESHOLD,
+      0.5,
+    ),
+    visualClassifierMaxImages: parsePositiveInt(
+      readCliValue("--visual-classifier-max-images") || process.env.VISUAL_CLASSIFIER_MAX_IMAGES,
+      3,
+    ),
+    visualClassifierMaxItems: parseNonNegativeInt(
+      readCliValue("--visual-classifier-max-items") || process.env.VISUAL_CLASSIFIER_MAX_ITEMS,
+      0,
+    ),
+    visualClassifierConcurrency: parsePositiveInt(
+      readCliValue("--visual-classifier-concurrency") || process.env.VISUAL_CLASSIFIER_CONCURRENCY,
+      8,
+    ),
+    visualClassifierTimeoutMs: parsePositiveInt(
+      readCliValue("--visual-classifier-timeout-ms") || process.env.VISUAL_CLASSIFIER_TIMEOUT_MS,
+      600_000,
+    ),
     userAgent: process.env.USER_AGENT?.trim() || DEFAULT_USER_AGENT,
     browserChannel: process.env.BROWSER_CHANNEL ?? "chrome",
     humanLike: parseBoolean(process.env.HUMAN_LIKE, true),
@@ -204,6 +242,15 @@ function parsePositiveInt(value: string | undefined, fallback: number): number {
 
   const parsed = Number.parseInt(value, 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function parseFloatOption(value: string | undefined, fallback: number): number {
+  if (!value) {
+    return fallback;
+  }
+
+  const parsed = Number.parseFloat(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
 }
 
 function parseNonNegativeInt(value: string | undefined, fallback: number): number {

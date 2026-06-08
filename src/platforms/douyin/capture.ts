@@ -8,6 +8,7 @@ import { attachNetworkCapture, type NetworkCaptureHandle } from "./networkCaptur
 import { dedupeVideos } from "./normalize.js";
 import { waitForDouyinLogin } from "./login.js";
 import { enrichDouyinDetailImages } from "./detailImages.js";
+import { classifyRecordsVisual } from "../../shared/visualClassifier.js";
 import { loadSeenIds, saveSeenIds } from "../../seenIds.js";
 
 const JINGXUAN_HOME = "https://www.douyin.com/jingxuan";
@@ -55,11 +56,12 @@ export async function captureDouyin(config: AppConfig): Promise<void> {
     }
 
     const enrichedVideos = await enrichDouyinDetailImages(page, videos, config);
-    const outputPath = await exportVideosToXlsx(enrichedVideos, config.outputDir, config.keyword, config.contentType);
-    console.log(`Exported ${enrichedVideos.length} videos to ${outputPath}`);
+    const scoredVideos = await classifyRecordsVisual(enrichedVideos, config, "douyin");
+    const outputPath = await exportVideosToXlsx(scoredVideos, config.outputDir, config.keyword, config.contentType);
+    console.log(`Exported ${scoredVideos.length} videos to ${outputPath}`);
 
     // 把本次导出的 ID 写入缓存，供下次运行去重
-    saveSeenIds(config.outputDir, "douyin", config.keyword, enrichedVideos.map((v) => v.awemeId));
+    saveSeenIds(config.outputDir, "douyin", config.keyword, scoredVideos.map((v) => v.awemeId));
   } finally {
     await context.close();
   }

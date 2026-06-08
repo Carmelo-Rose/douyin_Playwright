@@ -9,6 +9,7 @@ import { attachXhsNetworkCapture, type XhsNetworkCaptureHandle } from "./network
 import { dedupeNotes, formatCreateTimeFromNoteId, resolveXhsDisplayDateStable } from "./normalize.js";
 import { enrichXhsDetailImages } from "./detailImages.js";
 import { scoreXhsVisualQuality } from "./visualFilter.js";
+import { classifyRecordsVisual } from "../../shared/visualClassifier.js";
 import { loadSeenIds, saveSeenIds } from "../../seenIds.js";
 
 const XHS_SEARCH_URL = "https://www.xiaohongshu.com/search_result";
@@ -73,7 +74,11 @@ export async function captureXhs(config: AppConfig): Promise<void> {
     }
 
     const enrichedNotes = await enrichXhsDetailImages(page, deduped, config);
-    const scoredNotes = await scoreXhsVisualQuality(enrichedNotes, config);
+    // 方案 A：默认走本地 CLIP 批量识图（抓完→识图→过滤→导出）。
+    // 关掉本地分类器开关时，回退到原有 DashScope VLM 实时识图。
+    const scoredNotes = config.visualClassifierEnabled
+      ? await classifyRecordsVisual(enrichedNotes, config, "xhs")
+      : await scoreXhsVisualQuality(enrichedNotes, config);
     const outputPath = await exportNotesToXlsx(scoredNotes, config.outputDir, config.keyword);
     console.log(`Exported ${scoredNotes.length} notes to ${outputPath}`);
 

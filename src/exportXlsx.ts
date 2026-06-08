@@ -44,6 +44,12 @@ export async function exportVideosToXlsx(videos: VideoRecord[], outputDir: strin
     })),
     { header: "图片链接", key: "imageUrlsText", width: 80 },
     { header: "详情补图状态", key: "detailImageStatus", width: 24 },
+    { header: "视觉合格", key: "visualQualified", width: 14 },
+    { header: "视觉分数", key: "visualScore", width: 12 },
+    { header: "帽子类型", key: "visualHatType", width: 16 },
+    { header: "视觉状态", key: "visualStatus", width: 24 },
+    { header: "视觉原因", key: "visualReason", width: 50 },
+    { header: "已分析图片", key: "visualAnalyzedImages", width: 60 },
     { header: "封面链接", key: "coverUrl", width: 60 },
     { header: "抓取时间", key: "capturedAt", width: 24 },
   ];
@@ -52,6 +58,7 @@ export async function exportVideosToXlsx(videos: VideoRecord[], outputDir: strin
   worksheet.getRow(1).font = { bold: true };
   worksheet.views = [{ state: "frozen", ySplit: 1 }];
   await embedImageGrid(workbook, worksheet, videos.map((video) => resolveVideoImageUrls(video).slice(0, VIDEO_EMBEDDED_IMAGE_COUNT)), 11);
+  addQualifiedVideosSheet(workbook, videos, contentType);
 
   const filenamePrefix = contentType === "image" ? "douyin-notes" : "douyin-videos";
   const filename = `${filenamePrefix}-${sanitizeFilename(keyword)}-${formatTimestamp(new Date())}.xlsx`;
@@ -122,6 +129,28 @@ function videoToXlsxRow(video: VideoRecord): VideoRecord & { imageUrlsText: stri
 function resolveVideoImageUrls(video: VideoRecord): string[] {
   const urls = video.imageUrls?.length ? video.imageUrls : [video.coverUrl];
   return normalizeImageUrlList(urls);
+}
+
+function addQualifiedVideosSheet(workbook: ExcelJS.Workbook, videos: VideoRecord[], contentType: ContentType): void {
+  const qualified = videos.filter((video) => video.visualQualified === "是" || video.visualQualified === "疑似");
+  const worksheet = workbook.addWorksheet("qualified");
+  worksheet.columns = [
+    { header: "视觉合格", key: "visualQualified", width: 14 },
+    { header: "视觉分数", key: "visualScore", width: 12 },
+    { header: "帽子类型", key: "visualHatType", width: 16 },
+    { header: "分享链接", key: "shareUrl", width: 50 },
+    { header: contentType === "image" ? "图文ID" : "视频ID", key: "awemeId", width: 22 },
+    { header: "标题/描述", key: "desc", width: 60 },
+    { header: "作者", key: "authorName", width: 24 },
+    { header: "发布时间", key: "createTime", width: 24 },
+    { header: "点赞数", key: "diggCount", width: 12 },
+    { header: "收藏数", key: "collectCount", width: 12 },
+    { header: "视觉原因", key: "visualReason", width: 50 },
+    { header: "图片链接", key: "imageUrlsText", width: 80 },
+  ];
+  worksheet.addRows(qualified.map(videoToXlsxRow));
+  worksheet.getRow(1).font = { bold: true };
+  worksheet.views = [{ state: "frozen", ySplit: 1 }];
 }
 
 function noteToXlsxRow(note: NoteRecord): NoteRecord & { imageUrlsText: string } {

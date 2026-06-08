@@ -19,6 +19,12 @@ export interface VideoRecord {
   coverUrl: string;
   imageUrls: string[];
   detailImageStatus: string;
+  visualQualified?: string;
+  visualScore?: number;
+  visualReason?: string;
+  visualHatType?: string;
+  visualStatus?: string;
+  visualAnalyzedImages?: string;
   capturedAt: string;
   rawSnippet: string;
 }
