@@ -1,0 +1,27 @@
+{
+  "backbone": "clip-b32",
+  "n_samples": 1632,
+  "n_good": 560,
+  "n_bad": 1072,
+  "n_groups": 1398,
+  "n_splits": 5,
+  "pairs_per_good": 8,
+  "pairwise_auc_folds": [
+    0.889,
+    0.8866,
+    0.8882,
+    0.8777,
+    0.8791
+  ],
+  "clf_auc_folds": [
+    0.8847,
+    0.8781,
+    0.8994,
+    0.8613,
+    0.8703
+  ],
+  "pairwise_auc_mean": 0.8841,
+  "clf_auc_mean": 0.8787,
+  "delta": 0.0054,
+  "verdict": "基本持平 → 换范式本身在 good/bad 上不涨;增量得靠新的成对标注信息(笔记内排序/程度)"
+}

@@ -71,7 +71,7 @@ export default function ScrapeForm({ config, setConfig, hasApiKey, onApiKeyChang
             </select>
           </div>
           <div className="field">
-            <label>小红书排序</label>
+            <label>排序</label>
             <select value={config.sortBy} onChange={(e) => set("sortBy", e.target.value as AppConfig["sortBy"])}>
               <option value="latest">最新</option>
               <option value="comprehensive">综合</option>

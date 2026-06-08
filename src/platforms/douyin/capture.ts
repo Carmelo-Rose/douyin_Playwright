@@ -1,7 +1,7 @@
 import type { Page } from "playwright";
 import { exportVideosToXlsx } from "../../exportXlsx.js";
 import { humanScroll, maybeReadingPause, randomBetween, sleep } from "../../human.js";
-import type { ContentType, PublishTimeFilter, VideoRecord } from "../../types.js";
+import type { ContentType, PublishTimeFilter, SearchSort, VideoRecord } from "../../types.js";
 import type { AppConfig } from "../../config.js";
 import { openBrowserSession } from "../../browser.js";
 import { attachNetworkCapture, type NetworkCaptureHandle } from "./networkCapture.js";
@@ -80,7 +80,11 @@ async function captureJingxuan(page: Page, capture: NetworkCaptureHandle, config
     return [];
   }
 
-  await applySearchFilters(page, config.contentType, config.publishTime);
+  const filtersApplied = await applySearchFilters(page, config.contentType, config.publishTime, config.sortBy, "jingxuan");
+  if (!filtersApplied) {
+    console.warn("[douyin:jingxuan] Skipping source because the selected filters could not be applied.");
+    return [];
+  }
   await collectByScrolling(page, config);
   await capture.flush();
   const videos = withSource(capture.getVideos(), "jingxuan");
@@ -93,7 +97,11 @@ async function captureRootSearch(page: Page, capture: NetworkCaptureHandle, conf
   console.log(`Opening 综合搜索: ${url}`);
   capture.reset();
   await page.goto(url, { waitUntil: "domcontentloaded", timeout: 60_000 });
-  await applySearchFilters(page, config.contentType, config.publishTime);
+  const filtersApplied = await applySearchFilters(page, config.contentType, config.publishTime, config.sortBy, "root_search");
+  if (!filtersApplied) {
+    console.warn("[douyin:root_search] Skipping source because the selected filters could not be applied.");
+    return [];
+  }
   await collectByScrolling(page, config);
   await capture.flush();
   const videos = withSource(capture.getVideos(), "root_search");
@@ -124,32 +132,41 @@ function buildRootSearchUrl(keyword: string): string {
   return `https://www.douyin.com/root/search/${encodeURIComponent(keyword)}?aid=${ROOT_SEARCH_AID}&type=general`;
 }
 
-async function applySearchFilters(page: Page, contentType: ContentType, publishTime: PublishTimeFilter): Promise<void> {
+async function applySearchFilters(
+  page: Page,
+  contentType: ContentType,
+  publishTime: PublishTimeFilter,
+  sortBy: SearchSort,
+  source: string,
+): Promise<boolean> {
   await page.waitForTimeout(1_500);
   await waitIfCaptcha(page);
 
   const opened = await hoverVisibleText(page, ["筛选"], 3_000);
   if (!opened) {
-    console.warn("Could not open search filter panel. Continuing with post-capture age filtering only.");
-    return;
+    console.warn(`[douyin:${source}] Could not open search filter panel.`);
+    return false;
   }
 
   await page.waitForTimeout(1_000);
 
-  const latest = await clickVisibleText(page, ["最新发布"], 2_000);
+  const sortLabel = sortBy === "comprehensive" ? "综合排序" : "最新发布";
+  const sort = await clickVisibleText(page, [sortLabel], 2_000);
   const publishTimeLabel = resolvePublishTimeLabel(publishTime);
   const time = await clickVisibleText(page, [publishTimeLabel], 2_000);
   const contentLabel = contentType === "image" ? "图文" : "视频";
   const content = await clickVisibleText(page, [contentLabel], 2_000);
 
-  if (!latest || !time || !content) {
-    console.warn(`Search filter partially applied: 最新发布=${latest}, ${publishTimeLabel}=${time}, ${contentLabel}=${content}.`);
+  if (!sort || !time || !content) {
+    console.warn(`[douyin:${source}] Search filter partially applied: ${sortLabel}=${sort}, ${publishTimeLabel}=${time}, ${contentLabel}=${content}.`);
+    return false;
   } else {
-    console.log(`Applied search filters: 最新发布 / ${publishTimeLabel} / ${contentLabel}.`);
+    console.log(`[douyin:${source}] Applied search filters: ${sortLabel} / ${publishTimeLabel} / ${contentLabel}.`);
   }
 
   await page.waitForTimeout(2_000);
   await waitIfCaptcha(page);
+  return true;
 }
 
 function resolvePublishTimeLabel(publishTime: PublishTimeFilter): string {

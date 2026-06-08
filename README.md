@@ -19,7 +19,7 @@ cp .env.example .env
 - `MAX_SCROLLS`、`CAPTURE_TIMEOUT_MS`：滚动次数 / 最后等待时长
 - `CONTENT_TYPE=image`：内容形式，默认抓“图文”；需要切回视频可设为 `video`，也可用 `--content-type video` 临时覆盖
 - `PUBLISH_TIME=week`：页面发布时间筛选，支持 `day` / `week` / `half-year` / `unlimited`
-- `SORT_BY=latest`：小红书排序，支持 `latest` / `comprehensive`
+- `SORT_BY=latest`：排序，支持 `latest` / `comprehensive`；抖音对应“最新发布/综合排序”，小红书对应“最新/综合”
 - `ENRICH_DOUYIN_DETAIL_IMAGES=true` / `ENRICH_XHS_DETAIL_IMAGES=true`：图文会逐条打开详情页补抓多张图片；默认最多处理 30 条、每条最多 6 张、每条之间随机等待 5-12 秒，遇到验证码会停止补图并保留封面
 - `MAX_AGE_DAYS=7`：只导出最近 7 天发布的内容；设为 `0` 可关闭发布时间过滤
 - `RELEVANCE_KEYWORDS`：相关性过滤词，多个词用英文逗号分隔；留空时会根据 `KEYWORD` 自动生成基础关键词
