@@ -86,6 +86,28 @@ ml/model/
 
 ---
 
+## 运行环境（Windows 执行侧）
+
+- **机器分工**：Mac 端写代码/push（无 GPU、无数据、无依赖，跑不了训练）；**Windows 端（RTX 3050）实际抽特征/训练/识图**，全量标注数据只在本地 `D:\data\accio\douyin_Playwright`。
+- **Python 定位**：系统 `python` 可能没装依赖（`ModuleNotFoundError`）。`run.ps1` 会自动定位 Accio 内置、装好依赖的 Python：`%APPDATA%\Accio\pre-install\<哈希>\python\python.exe`。要手动跑消融/pairwise/analyze_fp 时，也用这个 python。
+- **实测**：torch 2.6.0+cu124、open_clip 3.3.0，每张图抽特征约 0.167s，全量约 5 分钟。
+- **PowerShell 设环境变量**：`$env:EMBED_BACKBONE="clip-b32"`（不是 cmd 的 `set`）。
+
+---
+
+## 工程坑清单（务必一读）
+
+1. **换 backbone 必须隔离特征缓存**：缓存键带 `feature_tag()` + 文件名按 backbone 分（`embed_cache_{tag}.npz`），否则 512 维与 1024 维混进同一 npz → `ValueError: all input arrays must have the same shape`。**键和文件都要隔离。**
+2. **dedup 余弦阈值 0.95 不可跨 embedding 空间移植**：不同 backbone 余弦分布不同。**评估对比一律用 `--no-dedup` 同样本集**；dedup 阈值是部署时按该 backbone 单独标定的旋钮，不能当对比变量。
+3. **美学分必须配 OpenAI CLIP ViT-L/14**（768 维 L2 归一化）匹配 LAION V2 口径，否则分数失真。它是**非归一化 1 维**，混进 dedup 余弦会污染 → 消融统一关 dedup 规避。
+4. **train / predict 的 `EMBED_BACKBONE` 必须一致**（维度 + 特征空间），否则识图静默错配。模型身份记在 `train_report.json` 的 `backbone` 字段，GUI「① 运行环境」会校验。
+5. **消融会覆盖线上模型** `aesthetic_clf.joblib`（每配置重训一次，只剩最后一个）。跑完消融必须用定案配置重训一次恢复识图模型。
+6. **extract 多份 xlsx 不要抽进同一文件夹**：它们都用 `rowNNN_imgN` 命名会**同名覆盖**（实测丢过约 23 张）。**每份 xlsx 抽到独立子文件夹。**
+7. **predict 是"先写 CSV 再分拣"**：`--csv` 父目录不存在会 `FileNotFoundError` 直接崩、**且分拣也没执行**。**先建好结果目录再跑。**
+8. **merge_feedback 要求 `--from` 下直接是 good/bad**：带 `xhs/`、`douyin/` 等子文件夹时要**逐个子文件夹分别 merge**。
+
+---
+
 ## 当前模型效果
 
 | 版本 | backbone（维度） | 样本(去重后) | 随机CV acc | 分组CV acc（真实） | 精确率(good) | 召回率(good) | F1 |
@@ -109,12 +131,16 @@ ml/model/
 
 | 文件 | 作用 |
 |---|---|
-| `run.ps1` | PowerShell 启动脚本（自动用对的 Python） |
-| `clip_utils.py` | 共享 CLIP 特征模块（带内容哈希缓存） |
-| `train_singleimage.py` | 单图训练 + 交叉验证 + 保存模型 |
+| `run.ps1` | PowerShell 启动脚本（自动用对的 Python）。⚠️ `train` 分支写死、不传参/不设 backbone，跑不了消融/pairwise |
+| `clip_utils.py` | 共享 CLIP 特征模块（多 backbone，`EMBED_BACKBONE` 切换，带内容哈希缓存） |
+| `aesthetic.py` | LAION 美学分（独立缓存）。**已评估放弃接入，代码保留备用** |
+| `train_singleimage.py` | 单图训练 + 交叉验证 + 保存模型（有 `--no-dedup` / `--dedup-cosine` 开关） |
 | `predict.py` | 识图命令：文件夹/单图 → good/bad + 置信度 + 分拣 |
-| `merge_feedback.py` | 把纠错后的结果合并进训练集 |
+| `merge_feedback.py` | 把纠错后的结果合并进训练集（`--from` 下需直接是 good/bad） |
 | `extract_images_only.py` | 从 xlsx 提取图片到文件夹（待判断新数据） |
+| `run_ablation.ps1` | 同口径消融脚本（`--no-dedup` 下逐个跑配置） |
+| `train_pairwise.py` | 零成本 pairwise 基线（排序 vs 二分类 AUC），**不碰线上模型** |
+| `analyze_fp.py` | FP 错例聚类：定位"模型最常把哪类 bad 误当 good"，指导定向补难负样本 |
 | `extract_dataset.py` `embed_images.py` `validate.py` | （阶段一遗留）笔记级方案，已不用 |
 
 ---
