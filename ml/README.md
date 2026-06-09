@@ -30,7 +30,7 @@
 .\ml\run.ps1 extract -Input "output\xxx.xlsx" -Out "ml\data\to_predict" -MaxNotes 30
 ```
 
-可选参数：`-Threshold 0.6`（调严格度）、`-Csv result.csv`（导出csv）、`-ImgsPerNote 2`（每条笔记取前几张）。
+可选参数：`-Threshold 0.6`（调严格度）、`-Csv result.csv`（导出csv）、`-ImgsPerNote 0`（每条笔记取几张图，**0=全部，默认**；填 N 则只取前 N 张）。
 
 ---
 

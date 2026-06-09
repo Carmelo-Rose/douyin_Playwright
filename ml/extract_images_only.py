@@ -119,7 +119,7 @@ def main():
     ap.add_argument("--input", required=True)
     ap.add_argument("--out", default="ml/data/to_predict")
     ap.add_argument("--max-notes", type=int, default=0, help="只提取前N条笔记，0=全部")
-    ap.add_argument("--imgs-per-note", type=int, default=2, help="每条笔记取前几张图，默认2(对齐判断习惯)")
+    ap.add_argument("--imgs-per-note", type=int, default=0, help="每条笔记取前几张图，0=全部(默认)")
     args = ap.parse_args()
 
     xlsx = Path(args.input)
@@ -149,11 +149,12 @@ def main():
     if args.max_notes > 0:
         rows = rows[: args.max_notes]
 
+    limit = args.imgs_per_note  # <=0 表示不限，取全部
     saved = 0
     for row0 in rows:
         cnt = 0
         for col0 in range(col_first, col_last + 1):
-            if cnt >= args.imgs_per_note:
+            if limit > 0 and cnt >= limit:
                 break
             media = anchors.get((row0, col0))
             if not media:
@@ -167,7 +168,8 @@ def main():
             except KeyError:
                 pass
 
-    print(f"[done] 提取 {saved} 张图 (笔记 {len(rows)} 条, 每条前 {args.imgs_per_note} 张) -> {out_dir}")
+    per = "全部" if limit <= 0 else f"前 {limit}"
+    print(f"[done] 提取 {saved} 张图 (笔记 {len(rows)} 条, 每条{per}张) -> {out_dir}")
 
 
 if __name__ == "__main__":
