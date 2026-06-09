@@ -14,3 +14,7 @@ social-monitor/.state/
 ml/*.log
 ml/_*.sh
 nul
+
+# ML 数据(标注资产/识图中转/分拣结果/聚类等全部不入 git，体积大且为临时产物)
+# 模型产物在 ml/model/ 单独跟踪；ml/data/ 整体忽略
+ml/data/
