@@ -1,27 +1,27 @@
 {
   "backbone": "clip-b32",
-  "n_samples": 1632,
-  "n_good": 560,
-  "n_bad": 1072,
-  "n_groups": 1398,
+  "n_samples": 4197,
+  "n_good": 1663,
+  "n_bad": 2534,
+  "n_groups": 1703,
   "n_splits": 5,
   "pairs_per_good": 8,
   "pairwise_auc_folds": [
-    0.889,
-    0.8866,
-    0.8882,
+    0.8683,
+    0.8712,
+    0.8959,
     0.8777,
-    0.8791
+    0.8994
   ],
   "clf_auc_folds": [
-    0.8847,
-    0.8781,
-    0.8994,
-    0.8613,
-    0.8703
+    0.8834,
+    0.8898,
+    0.8947,
+    0.895,
+    0.9073
   ],
-  "pairwise_auc_mean": 0.8841,
-  "clf_auc_mean": 0.8787,
-  "delta": 0.0054,
+  "pairwise_auc_mean": 0.8825,
+  "clf_auc_mean": 0.894,
+  "delta": -0.0115,
   "verdict": "基本持平 → 换范式本身在 good/bad 上不涨;增量得靠新的成对标注信息(笔记内排序/程度)"
 }
