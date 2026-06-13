@@ -18,7 +18,7 @@ param(
     [string]$Out = "ml\data\to_predict",
     [int]$MaxNotes = 0,
     [int]$ImgsPerNote = 0,
-    [double]$Threshold = 0.5,
+    [double]$Threshold = 0.75,
     [string]$Csv = ""
 )
 

@@ -10,7 +10,7 @@
   # 预测单张图
   python ml/predict.py --input path/to/one.webp
 
-  # 自定义阈值（默认 0.5，调高更严格）
+  # 自定义阈值（默认 0.75，调低更宽松）
   python ml/predict.py --input path/to/images --threshold 0.6
 
   # 结果导出 csv
@@ -52,7 +52,7 @@ def collect_images(input_path: Path):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--input", required=True, help="图片文件或文件夹")
-    ap.add_argument("--threshold", type=float, default=0.5, help="判 good 的概率阈值，默认0.5")
+    ap.add_argument("--threshold", type=float, default=0.75, help="判 good 的概率阈值，默认0.75(阈值分析:精确率0.79/召回0.68;0.5时精确率仅0.73)")
     ap.add_argument("--csv", default="", help="可选：导出结果到 csv")
     ap.add_argument("--sort-to", default="", help="可选：把图按判断结果复制到 <目录>/good 和 <目录>/bad")
     ap.add_argument("--json", action="store_true", help="机器可读模式：仅在 stdout 打印一行 JSON（供 Node 桥接解析），其余日志走 stderr")

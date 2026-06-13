@@ -30,7 +30,9 @@
 .\ml\run.ps1 extract -Input "output\xxx.xlsx" -Out "ml\data\to_predict" -MaxNotes 30
 ```
 
-可选参数：`-Threshold 0.6`（调严格度）、`-Csv result.csv`（导出csv）、`-ImgsPerNote 0`（每条笔记取几张图，**0=全部，默认**；填 N 则只取前 N 张）。
+可选参数：`-Threshold 0.75`（判 good 的概率阈值，**默认 0.75**；阈值分析显示 0.75 精确率 0.79/召回 0.68，0.5 时精确率仅 0.73。调低更宽松）、`-Csv result.csv`（导出csv）、`-ImgsPerNote 0`（每条笔记取几张图，**0=全部，默认**；填 N 则只取前 N 张）。
+
+> 💡 **挑图建议**：识图分拣本质是排序。要"挑最好的一批"，按文件名的 P(good) 前缀从高到低取前 N 张最稳——实测 top 300~500 张精确率 ~92%（远高于 0.5 阈值的全局 0.73）。阈值只决定 good/bad 那条分界线，不影响排序。
 
 ---
 
