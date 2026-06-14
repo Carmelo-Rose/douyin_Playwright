@@ -56,6 +56,7 @@ export async function captureDouyin(config: AppConfig): Promise<void> {
     }
 
     const enrichedVideos = await enrichDouyinDetailImages(page, videos, config);
+
     const scoredVideos = await classifyRecordsVisual(enrichedVideos, config, "douyin");
     const outputPath = await exportVideosToXlsx(scoredVideos, config.outputDir, config.keyword, config.contentType);
     console.log(`Exported ${scoredVideos.length} videos to ${outputPath}`);

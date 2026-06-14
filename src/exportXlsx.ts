@@ -132,7 +132,10 @@ function resolveVideoImageUrls(video: VideoRecord): string[] {
 }
 
 function addQualifiedVideosSheet(workbook: ExcelJS.Workbook, videos: VideoRecord[], contentType: ContentType): void {
-  const qualified = videos.filter((video) => video.visualQualified === "是" || video.visualQualified === "疑似");
+  const qualified = videos
+    .filter((video) => video.visualQualified === "是" || video.visualQualified === "疑似")
+    // 按 P(good) 降序：模型的核心价值是排序，best-first 便于人工终审从高分往下挑
+    .sort((a, b) => (b.visualScore ?? 0) - (a.visualScore ?? 0));
   const worksheet = workbook.addWorksheet("qualified");
   worksheet.columns = [
     { header: "视觉合格", key: "visualQualified", width: 14 },
@@ -161,7 +164,10 @@ function noteToXlsxRow(note: NoteRecord): NoteRecord & { imageUrlsText: string }
 }
 
 function addQualifiedNotesSheet(workbook: ExcelJS.Workbook, notes: NoteRecord[]): void {
-  const qualified = notes.filter((note) => note.visualQualified === "是" || note.visualQualified === "疑似");
+  const qualified = notes
+    .filter((note) => note.visualQualified === "是" || note.visualQualified === "疑似")
+    // 按 P(good) 降序：模型的核心价值是排序，best-first 便于人工终审从高分往下挑
+    .sort((a, b) => (b.visualScore ?? 0) - (a.visualScore ?? 0));
   const worksheet = workbook.addWorksheet("qualified");
   worksheet.columns = [
     { header: "视觉合格", key: "visualQualified", width: 14 },

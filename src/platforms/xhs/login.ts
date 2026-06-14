@@ -40,15 +40,17 @@ export async function waitForXhsLogin(
 async function isXhsLoggedIn(page: Page): Promise<boolean> {
   try {
     const cookies = await page.context().cookies(XHS_HOME);
-    const hasSession = cookies.some((c) => ["web_session", "webId", "gid"].includes(c.name) && c.value);
+    // web_session 才是小红书真正的登录态 cookie；webId/gid 匿名访客也有，不能据此判定已登录。
+    // 与抖音 sessionid 一样作决定性正信号：有它即视为已登录，不再被页面残留的"登录"字样误判。
+    const hasSession = cookies.some((c) => c.name === "web_session" && Boolean(c.value));
     if (hasSession) {
-      const loginVisible = await hasVisibleLoginText(page);
-      return !loginVisible;
+      return true;
     }
   } catch {
     // Fall through to DOM check.
   }
 
+  // 没有登录 cookie 时才退回 DOM 兜底。
   return !(await hasVisibleLoginText(page));
 }
 

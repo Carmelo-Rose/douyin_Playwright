@@ -74,6 +74,7 @@ export async function captureXhs(config: AppConfig): Promise<void> {
     }
 
     const enrichedNotes = await enrichXhsDetailImages(page, deduped, config);
+
     // 方案 A：默认走本地 CLIP 批量识图（抓完→识图→过滤→导出）。
     // 关掉本地分类器开关时，回退到原有 DashScope VLM 实时识图。
     const scoredNotes = config.visualClassifierEnabled

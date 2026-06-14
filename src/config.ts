@@ -146,7 +146,7 @@ function buildBaseConfig(options: LoadConfigOptions = {}): AppConfig {
     ),
     visualClassifierThreshold: parseFloatOption(
       readCliValue("--visual-classifier-threshold") || process.env.VISUAL_CLASSIFIER_THRESHOLD,
-      0.5,
+      0.75,
     ),
     visualClassifierMaxImages: parsePositiveInt(
       readCliValue("--visual-classifier-max-images") || process.env.VISUAL_CLASSIFIER_MAX_IMAGES,

@@ -181,7 +181,8 @@ ml/model/
 ## 后续阶段（待办）
 
 - [ ] **若要再上台阶 = 另立项目**：当前特征体系已到天花板，需换思路（pairwise 成对标注重做、或换/微调特征 backbone），而非继续刷数据
-- [ ] 接入主 TS 管线 / 支持直接对表格识图并写回结果
+- [x] ~~接入主 TS 管线~~：CLIP 抓后批量识图已接进 douyin/xhs capture（`classifyRecordsVisual`→`predict.py --json`→回填 visual* + qualified sheet），默认开启、VLM 可回退。2026-06-13 补：qualified sheet 按 P(good) 降序导出（漏斗 best-first 给人工终审）、CLI 阈值默认对齐 0.75
+- [ ] 支持直接对已有表格识图并写回结果（CLIP 版；VLM 版见 `xhs/scoreWorkbook.ts`）
 - [x] ~~独立 AI 图检测器~~：实测预训练伪影检测器（领域偏移）+ CLIP 最近邻自举（按题材聚）两路均失败，放弃；一眼 AI 当普通 bad 喂分类器（2026-06-13）
 - [x] ~~换多样关键词补难负样本压 FP~~：补图/清洗/换 backbone 多轮均打平，判定到天花板（2026-06-13）
 - [x] ~~backbone 选型~~：经同口径消融定 clip-b32，SigLIP2 打平、美学分无增量，已收尾（见 backbone_compare.md）
